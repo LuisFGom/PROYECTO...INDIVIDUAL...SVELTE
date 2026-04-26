@@ -1,0 +1,50 @@
+CEDULAS VÁLIDAS PARA PRUEBAS
+============================
+
+Las siguientes cedulas son VÁLIDAS según el algoritmo Módulo 10 de Ecuador.
+Todas han sido verificadas y pueden usarse para crear usuarios en el sistema.
+
+1. 2426275000
+2. 2049200559
+3. 1047169691
+4. 2217944038
+5. 1613046109
+6. 1057496331
+7. 2330833449
+8. 0424878239
+9. 1414187870
+10. 0856308697
+
+INSTRUCCIONES:
+==============
+
+1. Abre tu navegador en http://localhost:3001
+2. Si no estás logueado, inicia sesión con:
+   - Email: admin@test.com
+   - Contraseña: Password123!
+
+3. Ve a la sección de USUARIOS
+4. Haz clic en "Nuevo Usuario"
+5. En el campo de Cédula, ingresa UNA de las cedulas de la lista anterior
+6. Completa el resto del formulario:
+   - Nombre: Tu Nombre
+   - Apellido: Tu Apellido
+   - Correo: usuario@example.com
+   - Contraseña: Password123! (o similar con mayúscula, minúscula, número y símbolo)
+   - Rol: Selecciona un rol
+
+7. Haz clic en "Guardar"
+
+NOTAS IMPORTANTES:
+==================
+
+- La cedula DEBE ser exactamente 10 dígitos numéricos
+- La provincia (primeros 2 dígitos) DEBE estar entre 01 y 24
+- El tercer dígito DEBE estar entre 0 y 5 (para personas naturales)
+- El dígito verificador (último dígito) se calcula automáticamente
+- NO puedes cambiar la cedula después de crear un usuario
+
+Si tienes problemas:
+- Verifica que el backend esté corriendo: http://localhost:56398/api/usuarios
+- Verifica que el frontend esté corriendo: http://localhost:3001
+- Abre la consola del navegador (F12) para ver si hay errores

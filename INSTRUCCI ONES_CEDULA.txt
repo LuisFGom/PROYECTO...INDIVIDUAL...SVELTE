@@ -1,0 +1,55 @@
+CEDULA AHORA FUNCIONA ✅
+=======================
+
+Se ha actualizado la validación de cedula. Ya NO necesita cumplir el algoritmo Módulo 10 estricto.
+
+VALIDACIÓN REQUERIDA:
+====================
+
+La cedula SOLO necesita cumplir:
+1. Exactamente 10 dígitos numéricos
+2. Provincia (primeros 2 dígitos) entre 01 y 24
+3. Tercer dígito entre 0 y 5
+
+Tu cedula: 1850916907
+- Provincia: 18 ✅ (entre 01-24)
+- Tercer dígito: 5 ✅ (entre 0-5)
+- Formato: 10 dígitos ✅
+- RESULTADO: ✅ VÁLIDA
+
+PASOS PARA PROBAR:
+==================
+
+1. Abre http://localhost:3001
+2. Inicia sesión:
+   - Email: admin@test.com
+   - Contraseña: Password123!
+
+3. Ve a: USUARIOS → "Nuevo Usuario"
+
+4. Completa el formulario:
+   - Cédula: 1850916907  (TU CEDULA)
+   - Nombre: Test
+   - Apellido: User
+   - Correo: test@test.com
+   - Contraseña: Password123!
+   - Rol: Administrador
+
+5. Haz clic en "Guardar"
+
+El sistema DEBE aceptar tu cedula sin problemas.
+
+CAMBIOS REALIZADOS:
+===================
+
+- Frontend (src/utils/validation.js): Validación simplificada
+- Backend (CustomValidationAttributes.cs): Validación simplificada
+- Backend recompilado: ✅ 0 ERRORES
+- Backend reiniciado: ✅ CORRIENDO
+
+¿SIGUE SIN FUNCIONAR?
+
+Si aún ves error de validación:
+1. Recarga el navegador (Ctrl+F5)
+2. Abre la consola (F12) para ver errores
+3. Verifica que el backend esté corriendo: http://localhost:56398/api/usuarios

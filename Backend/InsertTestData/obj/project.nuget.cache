@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "dgSpecHash": "0kH52IyvfLE=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\InsertTestData\\InsertTestData.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.0\\microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\ASUS\\.nuget\\packages\\npgsql\\8.0.1\\npgsql.8.0.1.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "El paquete \"Npgsql\" 8.0.1 tiene una vulnerabilidad de gravedad alta conocida, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c",
+      "projectPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\InsertTestData\\InsertTestData.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\InsertTestData\\InsertTestData.csproj",
+      "libraryId": "Npgsql",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
+}

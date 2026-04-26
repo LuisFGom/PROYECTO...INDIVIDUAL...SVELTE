@@ -1,0 +1,66 @@
+using MediatR;
+using PuntoVenta.Application.Interfaces;
+using PuntoVenta.Application.DTOs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace PuntoVenta.Application.Features.Ventas.Queries
+{
+    public class GetVentaByIdQueryHandler : IRequestHandler<GetVentaByIdQuery, VentaDetailResponseDto>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public GetVentaByIdQueryHandler(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<VentaDetailResponseDto> Handle(GetVentaByIdQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var factura = await _unitOfWork.Facturas.GetFacturaConDetallesAsync(request.VentaId);
+
+                if (factura == null)
+                {
+                    throw new Exception($"Factura con ID {request.VentaId} no encontrada");
+                }
+
+                var resultado = new VentaDetailResponseDto
+                {
+                    VentaId = factura.Id,
+                    NumeroFactura = factura.NumeroFactura,
+                    FechaVenta = factura.FechaVenta,
+                    UsuarioId = factura.UsuarioId,
+                    UsuarioNombre = factura.UsuarioNombre,
+                    ClienteId = factura.ClienteId,
+                    ClienteNombre = factura.ClienteNombre,
+                    Subtotal = factura.Subtotal,
+                    PorcentajeIVA = factura.PorcentajeIVA,
+                    TotalImpuesto = factura.TotalImpuesto,
+                    TotalVenta = factura.TotalVenta,
+                    Estado = factura.Estado,
+                    Observaciones = factura.Observaciones,
+                    Detalles = factura.Detalles?.Select(d => new DetalleVentaResponseDto
+                    {
+                        ProductoId = d.ProductoId,
+                        ProductoNombre = d.ProductoNombre,
+                        Cantidad = d.Cantidad,
+                        PrecioUnitario = d.PrecioUnitario,
+                        Descuento = d.Descuento,
+                        Total = d.Total
+                    }).ToList() ?? new List<DetalleVentaResponseDto>()
+                };
+
+                return resultado;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al obtener factura: {ex.Message}");
+            }
+        }
+    }
+}
