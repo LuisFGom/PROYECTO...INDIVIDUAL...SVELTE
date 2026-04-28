@@ -21,12 +21,15 @@ const clienteService = {
     return httpClient.delete(`/clientes/${id}`)
   },
 
-  getEliminados() {
-    return httpClient.get('/eliminacionesclientes')
+  async getEliminados() {
+    // Trae todos los clientes y filtra los eliminados (activo: false o fechaEliminacion)
+    const clientes = await httpClient.get('/clientes')
+    return (clientes || []).filter(c => c.activo === false || c.fechaEliminacion)
   },
 
-  restaurar(clienteEliminadoId) {
-    return httpClient.put(`/clientes/${clienteEliminadoId}`, { activo: true })
+  restaurar(clienteId) {
+    // Reactiva el cliente (igual que update pero solo cambia activo)
+    return httpClient.put(`/clientes/${clienteId}`, { activo: true })
   }
 }
 

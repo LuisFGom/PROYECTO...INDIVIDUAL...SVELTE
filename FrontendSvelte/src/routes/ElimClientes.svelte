@@ -28,19 +28,18 @@
     totalPages = Math.ceil(filteredClientes.length / ITEMS_PER_PAGE) || 1
   }
 
-  const normalizeEliminado = (eliminado) => {
-    return {
-      id: eliminado.id,
-      clienteEliminadoId: eliminado.clienteEliminadoId,
-      nombre: eliminado.nombreClienteEliminado || eliminado.nombreCompleto || 'N/A',
-      documento: eliminado.documentoClienteEliminado || eliminado.documento || '-',
-      email: eliminado.emailClienteEliminado || eliminado.email || '-',
-      telefono: eliminado.telefonoClienteEliminado || eliminado.telefono || '-',
-      eliminadoPor: eliminado.nombreAdministrador || eliminado.eliminadoPor || 'Admin',
-      tipoEliminacion: eliminado.tipoEliminacion || 'Desactivación',
-      fechaEliminacion: eliminado.fechaEliminacion
-    }
-  }
+  // Normaliza el cliente eliminado (viene de /clientes, no de eliminaciones)
+  const normalizeEliminado = (c) => ({
+    id: c.id,
+    clienteEliminadoId: c.id,
+    nombre: (c.nombre ? c.nombre : '') + (c.apellido ? ' ' + c.apellido : ''),
+    documento: c.documento || '-',
+    email: c.email || '-',
+    telefono: c.telefono || '-',
+    eliminadoPor: '-', // No hay campo de admin eliminador en clientes
+    tipoEliminacion: 'Desactivación',
+    fechaEliminacion: c.fechaEliminacion || null
+  })
 
   const cargarDatos = async () => {
     loading = true
