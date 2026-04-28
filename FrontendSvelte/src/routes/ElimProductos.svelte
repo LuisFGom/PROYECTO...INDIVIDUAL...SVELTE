@@ -1,230 +1,338 @@
 <script>
   import { onMount } from 'svelte'
-  import { authStore } from '../stores/store.js'
-  import DataTable from '../components/DataTable.svelte'
+  import productoService from '../services/productoService.js'
+  import auditoriaService from '../services/auditoriaService.js'
   import Alert from '../components/Alert.svelte'
+  import Swal from 'sweetalert2'
+
+  const ITEMS_PER_PAGE = 10
 
   let productosEliminados = []
+  let filteredProductos = []
+  let paginatedProductos = []
   let loading = false
-  let error = ''
-  let authState = {}
+  let searchTerm = ''
+  let currentPage = 1
+  let totalPages = 1
+  let successMessage = ''
+  let auditoriaMap = {} // idProducto -> {nombreUsuario, fechaAccion}
 
   onMount(async () => {
-    const unsubAuth = authStore.subscribe(value => {
-      authState = value
-    })
-
-    // Verificar permisos
-    if (!authState.user || (authState.user.rol !== 'Admin' && authState.user.roleId !== 1)) {
-      error = 'Acceso Denegado - No tienes permisos para acceder a esta página'
-      return
-    }
-
-    cargarDatos()
-
-    return unsubAuth
+    await cargarDatos()
   })
+
+  $: {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    const end = start + ITEMS_PER_PAGE
+    paginatedProductos = [...filteredProductos.slice(start, end)]
+    totalPages = Math.ceil(filteredProductos.length / ITEMS_PER_PAGE) || 1
+  }
+
+  const normalizeEliminado = (p) => {
+    const aud = auditoriaMap[p.id]
+    return {
+      id: p.id,
+      productoEliminadoId: p.id,
+      codigo: p.codigo || '-',
+      nombre: p.nombre || '-',
+      descripcion: p.descripcion || '-',
+      precioCosto: p.precioCompra ?? 0,
+      precioVenta: p.precio ?? 0,
+      stock: p.stock ?? 0,
+      eliminadoPor: aud?.nombreUsuario || '-',
+      tipoEliminacion: 'Desactivación',
+      fechaEliminacion: aud?.fechaAccion || p.fechaEliminacion || null
+    }
+  }
 
   const cargarDatos = async () => {
     loading = true
     try {
-      const response = await fetch('http://localhost:5000/api/productos/eliminados', {
-        headers: {
-          'Authorization': `Bearer ${authState.token}`
+      // 1. Cargar auditoría de eliminaciones
+      const auditoria = await auditoriaService.getEliminacionesProductos()
+      auditoriaMap = {}
+      if (Array.isArray(auditoria)) {
+        for (const a of auditoria) {
+          if (a.registroAfectadoId) {
+            auditoriaMap[a.registroAfectadoId] = {
+              nombreUsuario: a.nombreUsuario,
+              fechaAccion: a.fechaAccion
+            }
+          }
         }
-      })
-
-      if (!response.ok) {
-        throw new Error('Error al cargar productos eliminados')
       }
-
-      productosEliminados = await response.json()
+      // 2. Cargar productos eliminados y cruzar con auditoría
+      let data = await productoService.getEliminados()
+      data = Array.isArray(data) ? data : []
+      productosEliminados = data.map(normalizeEliminado)
+      productosEliminados.sort((a, b) => new Date(b.fechaEliminacion) - new Date(a.fechaEliminacion))
+      searchTerm = ''
+      currentPage = 1
+      filterProductos()
     } catch (err) {
-      error = err.message
-      console.error(err)
+      Swal.fire('Error', err.message || 'Error al cargar productos eliminados', 'error')
+      console.error('Error cargando eliminados:', err)
     } finally {
       loading = false
     }
   }
 
-  const restaurar = async (productoId) => {
-    if (!window.confirm('¿Deseas restaurar este producto?')) return
+  const filterProductos = () => {
+    if (!searchTerm.trim()) {
+      filteredProductos = [...productosEliminados]
+    } else {
+      const term = searchTerm.toLowerCase()
+      filteredProductos = productosEliminados.filter(p =>
+        p.nombre?.toLowerCase().includes(term) ||
+        p.codigo?.toLowerCase().includes(term) ||
+        p.eliminadoPor?.toLowerCase().includes(term)
+      )
+    }
+    currentPage = 1
+  }
 
-    try {
-      const response = await fetch(`http://localhost:5000/api/productos/${productoId}/restaurar`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${authState.token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error('Error al restaurar producto')
-      }
-
-      productosEliminados = productosEliminados.filter(p => p.id !== productoId)
-      alert('Producto restaurado exitosamente')
-    } catch (err) {
-      error = err.message
-      console.error(err)
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      currentPage = page
     }
   }
 
-  const eliminarPermanente = async (productoId) => {
-    if (!window.confirm('¿Estás seguro de que deseas ELIMINAR PERMANENTEMENTE este producto? Esta acción no se puede deshacer')) return
+  const restaurar = async (producto) => {
+    const result = await Swal.fire({
+      title: '¿Restaurar producto?',
+      html: `Se restaurará el producto <strong>${producto.nombre}</strong>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sí, restaurar',
+      cancelButtonText: 'Cancelar'
+    })
+
+    if (!result.isConfirmed) return
 
     try {
-      const response = await fetch(`http://localhost:5000/api/productos/${productoId}/eliminar-permanente`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${authState.token}`
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error('Error al eliminar producto permanentemente')
-      }
-
-      productosEliminados = productosEliminados.filter(p => p.id !== productoId)
-      alert('Producto eliminado permanentemente')
+      await productoService.restaurar(producto.productoEliminadoId)
+      successMessage = `Producto ${producto.nombre} restaurado correctamente`
+      setTimeout(() => { successMessage = '' }, 3000)
+      productosEliminados = productosEliminados.filter(p => p.id !== producto.id)
+      filterProductos()
     } catch (err) {
-      error = err.message
-      console.error(err)
+      Swal.fire('Error', err.message || 'Error al restaurar producto', 'error')
+      console.error('Error restaurando:', err)
     }
   }
 </script>
 
-<div class="container">
+<div class="elimproductos-page">
+  <div class="page-header">
+    <h1><i class="fas fa-trash-restore"></i> Historial de Eliminaciones de Productos</h1>
+  </div>
+
+  {#if successMessage}
+    <Alert type="success" message={successMessage} />
+  {/if}
+
   <div class="card">
     <div class="card-header">
-      <h2>Eliminación de Productos</h2>
-      <p>Gestiona productos eliminados - Restaurar o eliminar permanentemente</p>
+      <input
+        class="input search-input"
+        type="text"
+        placeholder="Buscar por nombre, código, administrador..."
+        bind:value={searchTerm}
+        on:input={() => filterProductos()}
+      />
     </div>
 
-    {#if error}
-      <Alert type="error" message={error} />
-    {/if}
-
-    {#if loading}
-      <div class="flex-center" style="padding: 2rem;">
-        <div class="spinner"></div>
-      </div>
-    {:else if productosEliminados.length === 0}
-      <div class="empty-state">
-        <i class="fas fa-inbox"></i>
-        <p>No hay productos eliminados</p>
-      </div>
-    {:else}
-      <div class="table-container">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Código</th>
-              <th>Precio Venta</th>
-              <th>Stock</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each productosEliminados as producto (producto.id)}
+    <div class="card-body">
+      {#if loading}
+        <div class="loading">Cargando productos eliminados...</div>
+      {:else if productosEliminados.length === 0}
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>No hay productos eliminados</p>
+        </div>
+      {:else if filteredProductos.length === 0}
+        <div class="empty-state">
+          <i class="fas fa-search"></i>
+          <p>No se encontraron resultados</p>
+        </div>
+      {:else}
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
               <tr>
-                <td>{producto.nombre}</td>
-                <td>{producto.codigo}</td>
-                <td>${producto.precioVenta.toFixed(2)}</td>
-                <td>{producto.stockInicial}</td>
-                <td>
-                  <button
-                    class="btn btn-sm btn-success"
-                    on:click={() => restaurar(producto.id)}
-                    title="Restaurar producto"
-                  >
-                    <i class="fas fa-undo"></i> Restaurar
-                  </button>
-                  <button
-                    class="btn btn-sm btn-danger"
-                    on:click={() => eliminarPermanente(producto.id)}
-                    title="Eliminar permanentemente"
-                  >
-                    <i class="fas fa-trash"></i> Eliminar
-                  </button>
-                </td>
+                <th>FECHA</th>
+                <th>CÓDIGO</th>
+                <th>PRODUCTO</th>
+                <th>P. COSTO</th>
+                <th>P. VENTA</th>
+                <th>STOCK</th>
+                <th>ELIMINADO POR</th>
+                <th>TIPO</th>
+                <th>ACCIONES</th>
               </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
-    {/if}
+            </thead>
+            <tbody>
+              {#each paginatedProductos as producto (producto.id)}
+                <tr>
+                  <td>{producto.fechaEliminacion ? new Date(producto.fechaEliminacion).toLocaleString('es-EC') : '-'}</td>
+                  <td><span class="badge badge-secondary">{producto.codigo}</span></td>
+                  <td>{producto.nombre}</td>
+                  <td>${producto.precioCosto.toFixed(2)}</td>
+                  <td>${producto.precioVenta.toFixed(2)}</td>
+                  <td>{producto.stock}</td>
+                  <td>{producto.eliminadoPor}</td>
+                  <td>
+                    <span class="badge badge-warning">
+                      {producto.tipoEliminacion}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button
+                        class="btn btn-sm btn-success"
+                        on:click={() => restaurar(producto)}
+                        title="Restaurar producto"
+                      >
+                        <i class="fas fa-undo"></i> Restaurar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <button class="btn-page" on:click={() => goToPage(1)} disabled={currentPage === 1}>Primera</button>
+          <button class="btn-page" on:click={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>Anterior</button>
+          <span>Página {currentPage} de {totalPages}</span>
+          <button class="btn-page" on:click={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>Siguiente</button>
+          <button class="btn-page" on:click={() => goToPage(totalPages)} disabled={currentPage === totalPages}>Última</button>
+        </div>
+      {/if}
+    </div>
   </div>
 </div>
 
 <style>
-  .container {
+  .elimproductos-page {
     padding: 2rem;
   }
-
-  .card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
   }
-
-  .card-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  .card-header h2 {
+  .page-header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     color: #1f2937;
   }
-
-  .card-header p {
-    margin: 0.5rem 0 0 0;
-    color: #6b7280;
-    font-size: 0.875rem;
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
   }
-
-  .table-container {
+  .card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #f9fafb;
+  }
+  .input.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 0;
+  }
+  .card-body {
+    padding: 1.5rem;
+  }
+  .table-wrapper {
     overflow-x: auto;
   }
-
   .table {
     width: 100%;
     border-collapse: collapse;
+    margin-bottom: 1rem;
   }
-
-  .table thead {
-    background: #f9fafb;
-  }
-
-  .table th {
-    padding: 1rem;
+  .table th, .table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
     text-align: left;
+    font-size: 0.95rem;
+  }
+  .table th {
+    background: #f3f4f6;
+    color: #64748b;
     font-weight: 600;
-    color: #4b5563;
-    border-bottom: 1px solid #e5e7eb;
+    text-transform: uppercase;
+    font-size: 0.85rem;
   }
-
-  .table td {
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+  .badge {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 0.85em;
+    font-weight: 600;
+    border-radius: 0.5em;
+    background: #f3f4f6;
+    color: #6366f1;
+  }
+  .badge-warning {
+    background: #fef3c7;
+    color: #b45309;
+  }
+  .badge-secondary {
+    background: #e0e7ff;
+    color: #3730a3;
+  }
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .btn-page {
+    background: #f3f4f6;
     color: #1f2937;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.9rem;
+    margin: 0 0.2rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
   }
-
-  .table tbody tr:hover {
-    background: #f9fafb;
+  .btn-page:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
-
-  .empty-state {
+  .btn {
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  .btn-success {
+    background: #10b981;
+    color: white;
+  }
+  .loading, .empty-state {
     text-align: center;
-    padding: 3rem 1.5rem;
-    color: #6b7280;
+    color: #64748b;
+    padding: 2rem 0;
   }
-
   .empty-state i {
     font-size: 3rem;
     color: #d1d5db;

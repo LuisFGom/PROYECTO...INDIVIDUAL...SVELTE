@@ -5,6 +5,17 @@ const productoService = {
     return httpClient.get('/productos')
   },
 
+  // Obtiene productos eliminados (inactivos o con fechaEliminacion)
+  async getEliminados() {
+    const productos = await httpClient.get('/productos')
+    return (productos || []).filter(p => p.activo === false || p.fechaEliminacion)
+  },
+
+  // Restaura producto (activo: true, fechaEliminacion: null)
+  restaurar(productoId) {
+    return httpClient.put(`/productos/${productoId}`, { activo: true, fechaEliminacion: null })
+  },
+
   getById(id) {
     return httpClient.get(`/productos/${id}`)
   },
