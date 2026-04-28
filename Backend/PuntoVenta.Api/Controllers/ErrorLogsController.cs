@@ -31,7 +31,7 @@ namespace PuntoVenta.Api.Controllers
         public async Task<ActionResult<List<dynamic>>> GetErrorLogs(
             [FromQuery] DateTime? fechaInicio,
             [FromQuery] DateTime? fechaFin,
-            [FromQuery] string nivelSeveridad,
+            [FromQuery] string? nivelSeveridad,
             [FromQuery] bool? revisado)
         {
             try

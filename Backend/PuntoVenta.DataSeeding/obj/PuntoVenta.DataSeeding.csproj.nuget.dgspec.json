@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.DataSeeding\\PuntoVenta.DataSeeding.csproj": {}
+    "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.DataSeeding\\PuntoVenta.DataSeeding.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj": {
+    "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj",
+        "projectUniqueName": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj",
         "projectName": "PuntoVenta.Application",
-        "projectPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj",
-        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Application\\obj\\",
+        "projectPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,15 +26,14 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj": {
-                "projectPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj"
+              "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj": {
+                "projectPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj"
               }
             }
           }
@@ -49,7 +48,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -112,24 +111,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.DataSeeding\\PuntoVenta.DataSeeding.csproj": {
+    "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.DataSeeding\\PuntoVenta.DataSeeding.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.DataSeeding\\PuntoVenta.DataSeeding.csproj",
+        "projectUniqueName": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.DataSeeding\\PuntoVenta.DataSeeding.csproj",
         "projectName": "PuntoVenta.DataSeeding",
-        "projectPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.DataSeeding\\PuntoVenta.DataSeeding.csproj",
-        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.DataSeeding\\obj\\",
+        "projectPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.DataSeeding\\PuntoVenta.DataSeeding.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.DataSeeding\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -138,18 +137,17 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj": {
-                "projectPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj"
+              "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj": {
+                "projectPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj"
               },
-              "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj"
+              "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj"
               }
             }
           }
@@ -164,7 +162,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -229,24 +227,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj": {
+    "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj",
         "projectName": "PuntoVenta.Domain",
-        "projectPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj",
-        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Domain\\obj\\",
+        "projectPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Domain\\PuntoVenta.Domain.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -255,7 +253,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -274,7 +271,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -301,24 +298,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj": {
+    "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj",
         "projectName": "PuntoVenta.Infrastructure",
-        "projectPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Infrastructure\\PuntoVenta.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -327,15 +324,14 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj": {
-                "projectPath": "C:\\Users\\ASUS\\Desktop\\Sexto Semestre v\\Aplicaciones Moviles\\NorthWind\\ProyectoWEB_PruebaRendimiento\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj"
+              "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj": {
+                "projectPath": "C:\\Users\\User\\APLICACIONES MOVILES\\PROYECTO INDIVIDUAL SVELTE\\NorthWind_Front\\VersionM\\Backend\\PuntoVenta.Application\\PuntoVenta.Application.csproj"
               }
             }
           }
@@ -350,7 +346,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -395,7 +391,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

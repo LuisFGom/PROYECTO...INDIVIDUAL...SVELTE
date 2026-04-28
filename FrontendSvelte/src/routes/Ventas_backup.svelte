@@ -1,0 +1,1 @@
+# Backup del archivo Ventas.svelte anterior

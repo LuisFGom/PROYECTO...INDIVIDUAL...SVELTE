@@ -1,0 +1,620 @@
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║          DOCUMENTO DE VALIDACIONES, LIMITACIONES Y RESTRICCIONES - SISTEMA PUNTOVENTA v2                              ║
+║                    Generado: Abril 28, 2026 | Frontend: HTML/CSS - Backend: ASP.NET Core                              ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+NOTA IMPORTANTE: Las validaciones de LOGIN y REGISTRO ya fueron implementadas en Svelte y están documentadas en el componente.
+Este documento cubre TODAS las demás validaciones del sistema.
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                                    1. MÓDULO DE CLIENTES
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+VENTANA: Gestión de Clientes (clientes.js)
+DESCRIPCIÓN: Listado, creación, edición y eliminación de clientes con búsqueda avanzada
+
+├─ BÚSQUEDA (Campo de búsqueda en el header)
+│  ├─ Tipo: TEXT - Campo libre
+│  ├─ Funcionalidad: Búsqueda en tiempo real
+│  ├─ Busca por: 
+│  │  ├─ Nombre del cliente
+│  │  ├─ Documento (con o sin formato)
+│  │  ├─ Teléfono (sin formato)
+│  │  ├─ Correo/Email
+│  ├─ Validación: Ninguna (aceptar todos caracteres)
+│  ├─ Limitación: Ninguna
+│  └─ Comportamiento: Búsqueda inmediata mientras se escribe
+
+├─ CREAR/EDITAR CLIENTE - CAMPO: NOMBRE
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: TEXT
+│  ├─ Validación: Solo letras (sin números ni caracteres especiales)
+│  ├─ Limitación: No tiene límite en el código, pero puede haber límite en BD
+│  ├─ Regex: Acepta letras, espacios y acentos (á, é, í, ó, ú, ñ)
+│  ├─ Placeholder: "Nombre"
+│  └─ Comportamiento: Si se intenta ingresar números o caracteres especiales, se remueven automáticamente
+
+├─ CREAR/EDITAR CLIENTE - CAMPO: APELLIDO
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: TEXT
+│  ├─ Validación: Solo letras (sin números ni caracteres especiales)
+│  ├─ Limitación: No tiene límite explícito en el código
+│  ├─ Regex: Acepta letras, espacios y acentos (á, é, í, ó, ú, ñ)
+│  ├─ Placeholder: "Apellido"
+│  └─ Comportamiento: Si se intenta ingresar números o caracteres especiales, se remueven automáticamente
+
+├─ CREAR/EDITAR CLIENTE - CAMPO: CÉDULA/DOCUMENTO (Solo en CREACIÓN)
+│  ├─ Requerido: SÍ (solo en creación, en edición ESTÁ DESHABILITADO)
+│  ├─ Tipo: TEXT con máscara
+│  ├─ Formato: XX-XXX-XXX-X (10 dígitos totales)
+│  ├─ Limitación: Máximo 13 caracteres (incluyendo guiones)
+│  ├─ Validación:
+│  │  ├─ Solo acepta números (los guiones se agregan automáticamente)
+│  │  ├─ Exactamente 10 dígitos numéricos
+│  │  ├─ Regex: /^\d{10}$/
+│  ├─ Máscara automática: 
+│  │  ├─ Mientras escribes: 1 -> 1 | 12 -> 12 | 123 -> 12-3 | 1234 -> 12-345 | 12345 -> 12-345-6 | 123456 -> 12-345-67 | 1234567 -> 12-345-678 | 12345678 -> 12-345-678-9 | 123456789 -> 12-345-678-90
+│  ├─ Placeholder: "17-056-789-01 (formato: XX-XXX-XXX-X)"
+│  ├─ Nota: En edición está deshabilitado (gris) para evitar cambio accidental
+│  └─ Validación adicional: 
+│      └─ Error si: Documento vacío en creación NUEVO
+│      └─ Error si: Documento no tiene exactamente 10 dígitos
+
+├─ CREAR/EDITAR CLIENTE - CAMPO: EMAIL
+│  ├─ Requerido: NO (opcional)
+│  ├─ Tipo: EMAIL
+│  ├─ Validación: 
+│  │  ├─ Si se deja vacío: OK (no valida)
+│  │  ├─ Si se ingresa algo: Debe ser email válido con punto después del @
+│  │  ├─ Regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+│  ├─ Placeholder: "correo@ejemplo.com"
+│  └─ Error si: Email ingresado pero inválido (ej: "usuario@.com" sin dominio)
+
+├─ CREAR/EDITAR CLIENTE - CAMPO: TELÉFONO
+│  ├─ Requerido: NO (opcional)
+│  ├─ Tipo: TEXT con máscara
+│  ├─ Formato: 09-XXXX-XXXX (10 dígitos, generalmente para Ecuador)
+│  ├─ Limitación: Máximo 12 caracteres (incluyendo guiones)
+│  ├─ Validación:
+│  │  ├─ Solo acepta números (los guiones se agregan automáticamente)
+│  │  ├─ Entre 7 y 10 dígitos numéricos
+│  │  ├─ Regex: /^\d{7,10}$/
+│  ├─ Máscara automática:
+│  │  ├─ Mientras escribes: 09 -> 09 | 098 -> 09-8 | 0987 -> 09-87 | 09876 -> 09-876 | 098765 -> 09-8765 | 0987654 -> 09-8765-4 | 09876543 -> 09-8765-43 | 098765432 -> 09-8765-432 | 0987654321 -> 09-8765-4321
+│  ├─ Placeholder: "09-8765-4321 (formato: 09-XXXX-XXXX)"
+│  ├─ Nota adicional: "7-10 dígitos, máscara automática 09-XXXX-XXXX"
+│  └─ Error si: Teléfono ingresado pero no cumple con 7-10 dígitos
+
+├─ CREAR/EDITAR CLIENTE - CAMPO: DIRECCIÓN
+│  ├─ Requerido: NO (opcional)
+│  ├─ Tipo: TEXT
+│  ├─ Máximo: 100 caracteres
+│  ├─ Validación: Ninguna especial (acepta todos los caracteres)
+│  ├─ Placeholder: "Ej: Calle Principal 123 (máximo 100 caracteres)"
+│  ├─ Nota adicional: "Máximo 100 caracteres"
+│  └─ Error si: Dirección tiene más de 100 caracteres
+
+RESTRICCIONES GENERALES DEL MÓDULO:
+├─ Búsqueda: Se actualiza en tiempo real mientras escribes
+├─ Tabla: Muestra máximo 10 clientes por página (paginación)
+├─ Permiso: Solo ADMINS pueden crear, editar y eliminar clientes
+├─ Usuarios normales: Solo pueden ver la lista de clientes
+├─ Cédula: No puede ser modificada después de la creación del cliente
+└─ Estado: Clientes se marcan como "Activos" o "Inactivos", no se eliminan físicamente
+
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                                    2. MÓDULO DE PRODUCTOS
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+VENTANA: Gestión de Productos (productos.js)
+DESCRIPCIÓN: Listado, creación, edición y eliminación de productos con cálculos automáticos
+
+├─ BÚSQUEDA (Campo de búsqueda en el header)
+│  ├─ Tipo: TEXT - Campo libre
+│  ├─ Funcionalidad: Búsqueda en tiempo real
+│  ├─ Busca por: 
+│  │  ├─ Nombre del producto
+│  │  └─ Descripción del producto
+│  ├─ Validación: Ninguna (aceptar todos caracteres)
+│  └─ Limitación: Ninguna
+
+├─ CREAR/EDITAR PRODUCTO - CAMPO: NOMBRE
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: TEXT
+│  ├─ Validación: Ninguna especial (acepta todos los caracteres)
+│  ├─ Placeholder: "Nombre del producto"
+│  └─ Error si: Campo vacío al guardar
+
+├─ CREAR/EDITAR PRODUCTO - CAMPO: CÓDIGO
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: TEXT
+│  ├─ Validación: Ninguna especial (acepta todos los caracteres)
+│  ├─ Placeholder: "Código único"
+│  ├─ Nota: Se asume que el backend valida unicidad
+│  └─ Error si: Campo vacío al guardar
+
+├─ CREAR/EDITAR PRODUCTO - CAMPO: DESCRIPCIÓN
+│  ├─ Requerido: NO (opcional)
+│  ├─ Tipo: TEXTAREA
+│  ├─ Validación: Ninguna especial
+│  ├─ Placeholder: "Descripción del producto"
+│  └─ Limitación: No especificada en código
+
+├─ CREAR/EDITAR PRODUCTO - CAMPO: PRECIO COMPRA (Precio Costo)
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: NUMBER con paso decimal
+│  ├─ Formato: Decimal positivo
+│  ├─ Mínimo: 0.01
+│  ├─ Validación:
+│  │  ├─ Solo números y UN punto decimal
+│  │  ├─ Máximo 2 decimales después del punto
+│  │  ├─ Regex: /^[0-9]*\.?[0-9]{0,2}$/
+│  ├─ Placeholder: "Ej: 10.99 (máx 2 decimales)"
+│  ├─ Nota: "Decimal positivo, máximo 2 decimales"
+│  ├─ Paso: 0.01
+│  └─ Filtro en tiempo real: Si ingresa más de 2 decimales, se trunca automáticamente
+
+├─ CREAR/EDITAR PRODUCTO - CAMPO: PRECIO VENTA
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: NUMBER con paso decimal
+│  ├─ Formato: Decimal positivo
+│  ├─ Mínimo: 0.01
+│  ├─ Validación:
+│  │  ├─ Solo números y UN punto decimal
+│  │  ├─ Máximo 2 decimales después del punto
+│  │  ├─ Regex: /^[0-9]*\.?[0-9]{0,2}$/
+│  ├─ Placeholder: "Ej: 19.99 (máx 2 decimales)"
+│  ├─ Nota: "Decimal positivo, máximo 2 decimales"
+│  ├─ Paso: 0.01
+│  └─ Filtro en tiempo real: Si ingresa más de 2 decimales, se trunca automáticamente
+
+├─ CREAR/EDITAR PRODUCTO - CAMPO: STOCK INICIAL
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: NUMBER (solo enteros)
+│  ├─ Formato: Número entero positivo
+│  ├─ Mínimo: 0
+│  ├─ Validación:
+│  │  ├─ Solo números enteros
+│  │  ├─ No permite decimales
+│  │  ├─ Regex: Solo dígitos /^[0-9]+$/
+│  ├─ Placeholder: "Ej: 50 (solo números enteros)"
+│  ├─ Nota: "Número entero positivo"
+│  ├─ Paso: 1
+│  ├─ Filtro en tiempo real: Cualquier carácter que no sea dígito se elimina automáticamente
+│  └─ Validación adicional: Debe ser >= Stock Mínimo
+
+├─ CREAR/EDITAR PRODUCTO - CAMPO: STOCK MÍNIMO
+│  ├─ Requerido: NO (opcional, valor por defecto: 0)
+│  ├─ Tipo: NUMBER (solo enteros)
+│  ├─ Formato: Número entero positivo
+│  ├─ Mínimo: 0
+│  ├─ Validación:
+│  │  ├─ Solo números enteros
+│  │  ├─ No permite decimales
+│  │  ├─ Regex: Solo dígitos /^[0-9]+$/
+│  ├─ Placeholder: "0"
+│  ├─ Nota: "Debe ser <= al Stock Inicial"
+│  ├─ Valor por defecto: 0
+│  ├─ Paso: 1
+│  ├─ Filtro en tiempo real: Cualquier carácter que no sea dígito se elimina automáticamente
+│  └─ Validación adicional: Debe ser <= Stock Inicial (IMPORTANTE: Validación en guardar)
+
+├─ CREAR/EDITAR PRODUCTO - CAMPO: IVA (%)
+│  ├─ Requerido: NO (opcional, valor por defecto: 0)
+│  ├─ Tipo: NUMBER decimal
+│  ├─ Formato: Porcentaje (0-100)
+│  ├─ Mínimo: 0
+│  ├─ Máximo: 100
+│  ├─ Validación:
+│  │  ├─ Solo números y decimales
+│  │  ├─ Entre 0 y 100
+│  │  ├─ Paso: 0.01
+│  ├─ Placeholder: "0"
+│  ├─ Valor por defecto: 0
+│  └─ Nota: Se usa en cálculos automáticos
+
+CÁLCULOS AUTOMÁTICOS EN TIEMPO REAL:
+├─ MARGEN DE GANANCIA: Precio Venta - Precio Compra
+├─ MONTO IVA: (Precio Venta * IVA%) / 100
+├─ PRECIO FINAL: Precio Venta + Monto IVA
+├─ Formato: Moneda (ej: $10.50, $19.99)
+└─ Actualización: Se recalcula automáticamente al cambiar cualquier valor
+
+RESTRICCIONES GENERALES DEL MÓDULO:
+├─ Búsqueda: Se actualiza en tiempo real mientras escribes
+├─ Tabla: Muestra máximo 10 productos por página (paginación)
+├─ Permiso: Solo ADMINS pueden crear, editar y eliminar productos
+├─ Usuarios normales: Solo pueden ver la lista de productos
+├─ Stock Mínimo: Debe ser siempre menor o igual al Stock Inicial
+└─ Precios: No pueden ser negativos ni cero
+
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                                    3. MÓDULO DE VENTAS/FACTURAS
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+VENTANA: Listado de Ventas (ventas.js)
+DESCRIPCIÓN: Visualización, creación, edición, eliminación y generación de PDF de facturas
+
+├─ BÚSQUEDA (Campo de búsqueda en el header)
+│  ├─ Tipo: TEXT - Campo libre
+│  ├─ Funcionalidad: Búsqueda en tiempo real
+│  ├─ Busca por: 
+│  │  ├─ Número de factura
+│  │  └─ Nombre del cliente
+│  ├─ Validación: Ninguna (aceptar todos caracteres)
+│  └─ Limitación: Ninguna
+
+RESTRICCIONES GENERALES DEL MÓDULO:
+├─ Búsqueda: Se actualiza en tiempo real mientras escribes
+├─ Tabla: Muestra máximo 10 ventas por página (paginación)
+├─ Permisos: Todos los usuarios pueden ver, crear, editar y ver PDF
+├─ Eliminación: Solo ADMINS pueden eliminar ventas
+├─ Estados posibles: Completada, Cancelada, Pendiente
+├─ PDF: Se puede descargar desde el botón en la tabla o desde los detalles
+└─ Detalles: Se muestran en modal con información completa de la venta
+
+VENTANA: Nueva Venta / Editar Venta (nuevaventa.js)
+DESCRIPCIÓN: Creación y edición de facturas con manejo de líneas de items
+
+├─ CREAR/EDITAR VENTA - CAMPO: CLIENTE
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: SELECT/DROPDOWN (carga dinámica)
+│  ├─ Validación: Debe ser un cliente existente
+│  ├─ Comportamiento: Se cargan todos los clientes activos
+│  └─ Nota: No se pueden seleccionar clientes inactivos
+
+├─ CREAR/EDITAR VENTA - CAMPO: FECHA
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: DATE
+│  ├─ Validación: Fecha válida
+│  ├─ Valor por defecto: Fecha de hoy
+│  └─ Limitación: Generalmente no se puede poner fecha futura
+
+├─ LÍNEA DE VENTA (Tabla de items)
+│  ├─ CAMPO: PRODUCTO
+│  │  ├─ Requerido: SÍ (en cada línea)
+│  │  ├─ Tipo: SELECT/DROPDOWN
+│  │  ├─ Validación: Producto existente con stock disponible
+│  │  └─ Nota: Solo se muestran productos con stock > 0
+│  │
+│  ├─ CAMPO: CANTIDAD
+│  │  ├─ Requerido: SÍ (en cada línea)
+│  │  ├─ Tipo: NUMBER (solo enteros)
+│  │  ├─ Mínimo: 1
+│  │  ├─ Máximo: Stock disponible del producto
+│  │  ├─ Validación:
+│  │  │  ├─ Solo números enteros positivos
+│  │  │  ├─ No puede exceder stock disponible
+│  │  │  └─ Regex: /^\d+$/
+│  │  ├─ Filtro en tiempo real: Cualquier carácter que no sea dígito se elimina
+│  │  └─ Error si: Cantidad > stock disponible
+│  │
+│  ├─ CAMPO: PRECIO UNITARIO
+│  │  ├─ Requerido: SÍ (se autocarga)
+│  │  ├─ Tipo: NUMBER (solo lectura en la mayoría de casos)
+│  │  ├─ Formato: Decimal con hasta 2 decimales
+│  │  ├─ Validación: Se obtiene del producto
+│  │  └─ Nota: Puede ser editable en algunos sistemas
+│  │
+│  ├─ CAMPO: SUBTOTAL
+│  │  ├─ Requerido: NO (se calcula automáticamente)
+│  │  ├─ Tipo: NUMBER (solo lectura)
+│  │  ├─ Fórmula: Cantidad * Precio Unitario
+│  │  ├─ Formato: Moneda (ej: $50.50)
+│  │  └─ Nota: Se actualiza automáticamente
+│  │
+│  └─ ACCIÓN: ELIMINAR
+│     ├─ Tipo: BOTÓN
+│     ├─ Función: Elimina la línea de la venta
+│     └─ Nota: Se puede agregar/eliminar líneas libremente
+
+CÁLCULOS AUTOMÁTICOS EN TIEMPO REAL:
+├─ SUBTOTAL TOTAL: Suma de todos los subtotales
+├─ DESCUENTO: Si aplica (editable)
+├─ SUBTOTAL DESPUÉS DESCUENTO: Subtotal Total - Descuento
+├─ IVA TOTAL: (Subtotal después descuento * IVA%) / 100
+├─ TOTAL FACTURA: Subtotal - Descuento + IVA
+└─ Formato: Moneda
+
+RESTRICCIONES GENERALES DEL MÓDULO:
+├─ Mínimo de líneas: 1 línea obligatoria
+├─ Máximo de líneas: No especificado (depende del backend)
+├─ Cantidad: No puede ser 0 ni negativa
+├─ Cantidad: No puede exceder el stock disponible del producto
+├─ Cliente: No puede cambiar después de guardar (algunas versiones)
+├─ Descuento: Generalmente entre 0% y 100%
+├─ Estado: Por defecto es "Completada" al guardar
+└─ Stock: Se actualiza automáticamente cuando se guarda la venta
+
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                                    4. MÓDULO DE USUARIOS (ADMIN ONLY)
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+VENTANA: Gestión de Usuarios (usuarios.js)
+DESCRIPCIÓN: Listado, creación, edición y eliminación de usuarios (solo para ADMINS)
+
+RESTRICCIÓN DE ACCESO:
+├─ Solo usuarios con rol "Admin" pueden acceder
+├─ Otros usuarios ven: "Acceso Denegado - No tienes permisos para acceder a esta página"
+└─ Verificación: Se hace automáticamente al cargar la página
+
+├─ BÚSQUEDA (Campo de búsqueda en el header)
+│  ├─ Tipo: TEXT - Campo libre
+│  ├─ Funcionalidad: Búsqueda en tiempo real
+│  ├─ Busca por: 
+│  │  ├─ Nombre de usuario
+│  │  ├─ Nombre completo
+│  │  └─ Email
+│  ├─ Validación: Ninguna (aceptar todos caracteres)
+│  └─ Limitación: Ninguna
+
+├─ CREAR USUARIO - CAMPO: NOMBRE DE USUARIO
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: TEXT
+│  ├─ Máximo: 20 caracteres
+│  ├─ Validación: 
+│  │  ├─ Solo letras (sin números ni caracteres especiales)
+│  │  ├─ De 3 a 20 caracteres (aunque el input limita a 20)
+│  │  ├─ Regex: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/
+│  ├─ Placeholder: "Ejemplo: Juan (3-20 letras, sin números)"
+│  ├─ Nota: "Solo se permiten letras (máximo 20 caracteres)"
+│  ├─ Filtro en tiempo real: 
+│  │  ├─ Números y caracteres especiales se eliminan automáticamente
+│  │  └─ Se trunca a 20 caracteres
+│  └─ Error si: 
+│      ├─ Vacío
+│      ├─ Menos de 3 caracteres
+│      ├─ Más de 20 caracteres
+│      └─ Contiene números o caracteres especiales
+
+├─ CREAR USUARIO - CAMPO: NOMBRE
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: TEXT
+│  ├─ Máximo: 20 caracteres
+│  ├─ Validación: 
+│  │  ├─ Solo letras (sin números ni caracteres especiales)
+│  │  ├─ De 2 a 20 caracteres (aunque el input limita a 20)
+│  │  ├─ Regex: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/
+│  ├─ Placeholder: "Ejemplo: Juan Carlos (2-20 letras)"
+│  ├─ Nota: "Solo se permiten letras (máximo 20 caracteres)"
+│  ├─ Filtro en tiempo real: 
+│  │  ├─ Números y caracteres especiales se eliminan automáticamente
+│  │  └─ Se trunca a 20 caracteres
+│  └─ Error si: 
+│      ├─ Vacío
+│      ├─ Menos de 2 caracteres
+│      ├─ Más de 20 caracteres
+│      └─ Contiene números o caracteres especiales
+
+├─ CREAR USUARIO - CAMPO: APELLIDO
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: TEXT
+│  ├─ Máximo: 20 caracteres
+│  ├─ Validación: 
+│  │  ├─ Solo letras (sin números ni caracteres especiales)
+│  │  ├─ De 2 a 20 caracteres (aunque el input limita a 20)
+│  │  ├─ Regex: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/
+│  ├─ Placeholder: "Ejemplo: Pérez (máximo 20 letras)"
+│  ├─ Nota: "Solo se permiten letras (máximo 20 caracteres)"
+│  ├─ Filtro en tiempo real: 
+│  │  ├─ Números y caracteres especiales se eliminan automáticamente
+│  │  └─ Se trunca a 20 caracteres
+│  └─ Error si: 
+│      ├─ Vacío
+│      ├─ Menos de 2 caracteres
+│      ├─ Más de 20 caracteres
+│      └─ Contiene números o caracteres especiales
+
+├─ CREAR USUARIO - CAMPO: EMAIL
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: EMAIL
+│  ├─ Validación: 
+│  │  ├─ Email válido con formato correcto
+│  │  ├─ Debe tener punto después del @
+│  │  ├─ Regex: /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+│  ├─ Placeholder: "Ejemplo: usuario@ejemplo.com"
+│  ├─ Nota: "Debe ser un email válido con punto después del @ (ej: usuario@dominio.com)"
+│  └─ Error si: 
+│      ├─ Vacío
+│      ├─ Formato de email inválido
+│      ├─ Sin punto después del @
+│      └─ Dominio inválido
+
+├─ CREAR USUARIO - CAMPO: CONTRASEÑA
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: PASSWORD (oculta)
+│  ├─ Mínimo: 8 caracteres
+│  ├─ Validación: 
+│  │  ├─ Mínimo 8 caracteres
+│  │  ├─ Al menos 1 mayúscula
+│  │  ├─ Al menos 1 minúscula
+│  │  ├─ Al menos 1 número
+│  │  ├─ Al menos 1 carácter especial de: @$!%*?&
+│  │  ├─ Regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
+│  ├─ Placeholder: "Ejemplo: Pass123@ (mayús, minús, número, símbolo)"
+│  ├─ Nota: "Debe contener: mayúscula, minúscula, número y carácter especial (@$!%*?&)"
+│  └─ Error si: 
+│      ├─ Vacío
+│      ├─ Menos de 8 caracteres
+│      ├─ No tiene mayúscula
+│      ├─ No tiene minúscula
+│      ├─ No tiene número
+│      └─ No tiene carácter especial
+
+├─ CREAR USUARIO - CAMPO: CONFIRMAR CONTRASEÑA
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: PASSWORD (oculta)
+│  ├─ Validación: 
+│  │  ├─ Debe ser idéntica a la contraseña
+│  │  ├─ Se compara carácter por carácter
+│  ├─ Placeholder: "Ejemplo: Pass123@ (debe ser igual)"
+│  └─ Error si: 
+│      ├─ Vacío
+│      └─ No coincide exactamente con la contraseña
+
+├─ CREAR USUARIO - CAMPO: ROL
+│  ├─ Requerido: SÍ (obligatorio)
+│  ├─ Tipo: SELECT/DROPDOWN
+│  ├─ Opciones: Se cargan dinámicamente desde la BD (Roles)
+│  ├─ Validación: Debe seleccionar un rol de la lista
+│  ├─ Placeholder: "Selecciona un rol..."
+│  └─ Error si: No selecciona ningún rol
+
+EDICIÓN DE USUARIO:
+├─ Campos editables: Nombre, Apellido, Email, Contraseña, Rol
+├─ Nombre de Usuario: NO se puede editar (solo lectura)
+├─ Validaciones: Las mismas que en la creación
+└─ Nota: Si no se cambia la contraseña, se envía el valor anterior
+
+RESTRICCIONES GENERALES DEL MÓDULO:
+├─ Búsqueda: Se actualiza en tiempo real mientras escribes
+├─ Tabla: Muestra máximo 10 usuarios por página (paginación)
+├─ Permiso: Solo ADMINS pueden ver, crear, editar y eliminar usuarios
+├─ Nombre de Usuario: No se puede modificar después de la creación
+├─ Email: Debe ser único (validación en backend)
+├─ Contraseña: Debe cumplir requisitos de complejidad
+└─ Rol: No se puede crear usuario sin rol asignado
+
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                                    5. MÓDULO DE AUDITORÍA/LOGS
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+VENTANA: Auditoría (auditoria.js)
+DESCRIPCIÓN: Visualización de log de acciones realizadas en el sistema
+
+RESTRICCIONES GENERALES:
+├─ Solo ADMINS pueden ver la auditoría
+├─ Solo lectura (no hay edición ni eliminación)
+├─ Muestra: Usuario, Acción, Fecha, Detalles
+├─ Acciones registradas: Crear, Editar, Eliminar, Descargar, Etc.
+└─ Formato de fecha: DD/MM/YYYY HH:MM
+
+VENTANA: Logs de Error (error-logs.js)
+DESCRIPCIÓN: Visualización de errores que ocurrieron en el sistema
+
+RESTRICCIONES GENERALES:
+├─ Solo ADMINS pueden ver los logs de error
+├─ Solo lectura (no hay edición ni eliminación)
+├─ Muestra: Fecha, Tipo de Error, Mensaje, Stack Trace
+├─ Se usa para debugging y monitoreo del sistema
+└─ Formato de fecha: DD/MM/YYYY HH:MM:SS
+
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                                    6. MÓDULO DE ELIMINACIONES (SOFT DELETE)
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+Los siguientes módulos son SOLO para ADMINS y muestran registros marcados como eliminados:
+
+VENTANA: Eliminación de Usuarios (eliminaciones-usuarios.js)
+├─ Muestra: Usuarios marcados como inactivos/eliminados
+├─ Permiso: Solo ADMINS
+├─ Acciones: Ver detalles, Restaurar, Eliminar permanentemente
+└─ Validación: Confirmar antes de restaurar o eliminar
+
+VENTANA: Eliminación de Clientes (eliminaciones-clientes.js)
+├─ Muestra: Clientes marcados como inactivos/eliminados
+├─ Permiso: Solo ADMINS
+├─ Acciones: Ver detalles, Restaurar, Eliminar permanentemente
+└─ Validación: Confirmar antes de restaurar o eliminar
+
+VENTANA: Eliminación de Productos (eliminaciones-productos.js)
+├─ Muestra: Productos marcados como inactivos/eliminados
+├─ Permiso: Solo ADMINS
+├─ Acciones: Ver detalles, Restaurar, Eliminar permanentemente
+└─ Validación: Confirmar antes de restaurar o eliminar
+
+VENTANA: Eliminación de Ventas (eliminaciones-ventas.js)
+├─ Muestra: Ventas marcadas como eliminadas
+├─ Permiso: Solo ADMINS
+├─ Acciones: Ver detalles, Restaurar, Eliminar permanentemente
+└─ Validación: Confirmar antes de restaurar o eliminar
+
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                                    7. PATRONES Y VALIDACIONES GLOBALES
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+FORMATOS Y MÁSCARAS UTILIZADAS:
+├─ CÉDULA ECUATORIANA: XX-XXX-XXX-X (10 dígitos)
+├─ TELÉFONO ECUATORIANO: 09-XXXX-XXXX (10 dígitos)
+├─ PRECIOS: Decimal con 2 decimales máximo (ej: 19.99)
+├─ STOCK: Números enteros positivos
+├─ PORCENTAJE: Números de 0 a 100 con hasta 2 decimales
+├─ NOMBRE/APELLIDO: Solo letras, espacios y acentos
+├─ EMAIL: Formato estándar con punto después del @
+└─ FECHAS: DD/MM/YYYY (formato español/ecuatoriano)
+
+VALIDACIONES COMUNES:
+├─ Campos requeridos: Se marcan con *
+├─ Búsqueda: En tiempo real sin necesidad de botón
+├─ Paginación: 10 registros por página por defecto
+├─ Autocompletado: Algunos selectos cargan opciones dinámicamente
+├─ Confirmación: Se pide confirmación antes de eliminar
+├─ Mensajes: Se usan SweetAlert2 para notificaciones
+└─ Validación del lado del cliente Y servidor
+
+RESTRICCIONES GLOBALES:
+├─ Acceso: Basado en roles (Admin, Usuario)
+├─ Permisos: Implementados en frontend y backend
+├─ Datos: Se cargan dinámicamente del servidor
+├─ Errores: Se muestran alertas al usuario
+├─ Formato: Responsive para dispositivos móviles
+└─ Idioma: Todo en español (español ecuatoriano en algunos casos)
+
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                                    APÉNDICE: NOTAS IMPORTANTES
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+1. VALIDACIONES EN CLIENTE Y SERVIDOR:
+   - Todas las validaciones se hacen en el frontend (HTML/JavaScript)
+   - El backend (.NET Core) hace validaciones adicionales más rigurosas
+   - Nunca confiar SOLO en validaciones del cliente
+
+2. MÁSCARAS AUTOMÁTICAS:
+   - Se aplican en tiempo real mientras el usuario escribe
+   - No permiten caracteres no válidos
+   - Los guiones/separadores se agregan automáticamente
+
+3. BÚSQUEDA:
+   - Busca en tiempo real sin necesidad de presionar Enter
+   - Se filtran resultados mientras se escribe
+   - Es case-insensitive (no diferencia mayúsculas)
+
+4. PAGINACIÓN:
+   - Máximo 10 registros por página
+   - Se actualiza automáticamente
+   - Botones: Primera, Anterior, Siguiente, Última
+
+5. PERMISOS:
+   - Validados en frontend para UX
+   - Validados en backend para seguridad
+   - Admin: Acceso total a todas las funciones
+   - Usuario: Acceso limitado (no crear/editar/eliminar)
+
+6. SOFT DELETE:
+   - Los registros no se eliminan, se marcan como inactivos
+   - Hay módulos separados para ver/restaurar eliminados
+   - Solo ADMINS pueden ver eliminaciones
+
+7. DATOS SENSIBLES:
+   - Contraseñas se envían hasheadas al servidor
+   - Tokens se guardan en localStorage
+   - No se guardan datos sensibles sin encriptar
+
+8. FORMATOS DE RESPUESTA:
+   - Todos los errores van con status code HTTP apropiado
+   - Éxitos van con status 200/201
+   - Los mensajes de error son amigables para el usuario
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                                    FIN DEL DOCUMENTO
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+Documento generado para referencia del proyecto PuntoVenta v2
+Fecha: Abril 28, 2026
+Sistema Operativo: Multiplataforma (Windows, Linux, macOS)

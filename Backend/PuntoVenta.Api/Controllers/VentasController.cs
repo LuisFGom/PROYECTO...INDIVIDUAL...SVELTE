@@ -413,7 +413,11 @@ namespace PuntoVenta.Api.Controllers
                 }
 
                 // Generar PDF simple con información de la factura
-                var pdfBytes = GenerarPDFFactura(factura);
+                byte[]? pdfBytes = GenerarPDFFactura(factura);
+                if (pdfBytes == null)
+                {
+                    return StatusCode(500, new { message = "Error al generar PDF: contenido nulo" });
+                }
 
                 return File(pdfBytes, "application/pdf", $"Factura_{factura.NumeroFactura}.pdf");
             }
@@ -471,10 +475,15 @@ namespace PuntoVenta.Api.Controllers
                 Console.WriteLine($"[PDF] Factura encontrada. ID: {factura.Id}, Detalles: {factura.Detalles?.Count ?? 0}");
                 Console.WriteLine($"[PDF] Llamando a GenerarPDFFactura...");
                 
-                byte[] pdfBytes;
+                byte[]? pdfBytes;
                 try
                 {
                     pdfBytes = GenerarPDFFactura(factura);
+                    if (pdfBytes == null)
+                    {
+                        Console.WriteLine($"[PDF] ERROR: GenerarPDFFactura retornó nulo");
+                        return StatusCode(500, new { message = "Error al generar PDF: contenido nulo" });
+                    }
                     Console.WriteLine($"[PDF] PDF generado correctamente. Tamaño: {pdfBytes.Length} bytes");
                 }
                 catch (Exception pdfEx)

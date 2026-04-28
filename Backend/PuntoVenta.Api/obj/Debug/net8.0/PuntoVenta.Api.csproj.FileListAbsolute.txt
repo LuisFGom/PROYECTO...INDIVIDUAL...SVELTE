@@ -183,7 +183,10 @@ C:\Users\ASUS\Desktop\Sexto Semestre v\Aplicaciones Moviles\NorthWind\ProyectoWE
 C:\Users\ASUS\Desktop\Sexto Semestre v\Aplicaciones Moviles\NorthWind\ProyectoWEB_PruebaRendimiento\VersionM\Backend\PuntoVenta.Api\obj\Debug\net8.0\PuntoVenta.Api.pdb
 C:\Users\ASUS\Desktop\Sexto Semestre v\Aplicaciones Moviles\NorthWind\ProyectoWEB_PruebaRendimiento\VersionM\Backend\PuntoVenta.Api\obj\Debug\net8.0\PuntoVenta.Api.genruntimeconfig.cache
 C:\Users\ASUS\Desktop\Sexto Semestre v\Aplicaciones Moviles\NorthWind\ProyectoWEB_PruebaRendimiento\VersionM\Backend\PuntoVenta.Api\obj\Debug\net8.0\ref\PuntoVenta.Api.dll
+C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\appsettings.json
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\appsettings.Production.json
+C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\package-lock.json
+C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\PuntoVenta.Api.staticwebassets.endpoints.json
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\LatoFont\Lato-Black.ttf
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\LatoFont\Lato-BlackItalic.ttf
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\LatoFont\Lato-Bold.ttf
@@ -203,8 +206,6 @@ C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\Ve
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\LatoFont\Lato-Thin.ttf
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\LatoFont\Lato-ThinItalic.ttf
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\LatoFont\OFL.txt
-C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\appsettings.json
-C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\PuntoVenta.Api.staticwebassets.endpoints.json
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\PuntoVenta.Api.exe
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\PuntoVenta.Api.deps.json
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\PuntoVenta.Api.runtimeconfig.json
@@ -367,4 +368,3 @@ C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\Ve
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\obj\Debug\net8.0\PuntoVenta.Api.pdb
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\obj\Debug\net8.0\PuntoVenta.Api.genruntimeconfig.cache
 C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\obj\Debug\net8.0\ref\PuntoVenta.Api.dll
-C:\Users\User\APLICACIONES MOVILES\PROYECTO INDIVIDUAL SVELTE\NorthWind_Front\VersionM\Backend\PuntoVenta.Api\bin\Debug\net8.0\package-lock.json
