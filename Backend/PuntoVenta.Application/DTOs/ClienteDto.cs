@@ -61,6 +61,8 @@ namespace PuntoVenta.Application.DTOs
         public string? Email { get; set; }
 
         public bool? Activo { get; set; }
+
+        public DateTime? FechaEliminacion { get; set; } // Permite restaurar correctamente
     }
 
     /// <summary>

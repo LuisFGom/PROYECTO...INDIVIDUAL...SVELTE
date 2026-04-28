@@ -291,7 +291,8 @@ namespace PuntoVenta.Api.Controllers
                     cliente.Email, 
                     cliente.Telefono, 
                     cliente.Direccion, 
-                    cliente.Activo 
+                    cliente.Activo, 
+                    cliente.FechaEliminacion
                 };
 
                 // Validar que el correo sea único si se proporciona y es diferente
@@ -317,6 +318,9 @@ namespace PuntoVenta.Api.Controllers
                 {
                     cliente.Activo = updateClienteDto.Activo.Value;
                 }
+
+                // Actualizar la fecha de eliminación (puede ser null para restaurar)
+                cliente.FechaEliminacion = updateClienteDto.FechaEliminacion;
 
                 await _unitOfWork.Clientes.UpdateAsync(cliente);
                 await _unitOfWork.SaveChangesAsync();
