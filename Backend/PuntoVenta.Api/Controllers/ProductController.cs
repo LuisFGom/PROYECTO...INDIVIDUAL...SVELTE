@@ -34,6 +34,32 @@ namespace PuntoVenta.Api.Controllers
             return Ok(productos);
         }
 
+        // NUEVO ENDPOINT: Productos eliminados (inactivos o con fecha de eliminación)
+        [HttpGet("eliminados")]
+        public async Task<IActionResult> GetProductosEliminados()
+        {
+            var productos = await _unitOfWork.Productos.GetAllAsync();
+            var eliminados = productos
+                .Where(p => p is { Activo: false } || (p.GetType().GetProperty("FechaEliminacion")?.GetValue(p) != null))
+                .Select(p => new {
+                    p.Id,
+                    p.Codigo,
+                    p.Nombre,
+                    p.PrecioCompra,
+                    p.Precio,
+                    p.Stock,
+                    p.StockMinimo,
+                    p.Descripcion,
+                    p.PorcentajeIVA,
+                    p.FechaCreacion,
+                    p.FechaActualizacion,
+                    p.Activo,
+                    FechaEliminacion = p.GetType().GetProperty("FechaEliminacion")?.GetValue(p)
+                })
+                .ToList();
+            return Ok(eliminados);
+        }
+
         [Authorize(Roles = "Administrador,Admin")]
         [HttpPost]
         public async Task<IActionResult> CrearProducto([FromBody] CreateProductCommand command)

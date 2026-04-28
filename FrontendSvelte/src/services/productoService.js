@@ -7,8 +7,7 @@ const productoService = {
 
   // Obtiene productos eliminados (inactivos o con fechaEliminacion)
   async getEliminados() {
-    const productos = await httpClient.get('/productos')
-    return (productos || []).filter(p => p.activo === false || p.fechaEliminacion)
+    return await httpClient.get('/productos/eliminados')
   },
 
   // Restaura producto (activo: true, fechaEliminacion: null)
