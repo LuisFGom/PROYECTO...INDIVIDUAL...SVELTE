@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { formatters } from '../utils/validators.js'
   import clienteService from '../services/clienteService.js'
+  import auditoriaService from '../services/auditoriaService.js'
   import Alert from '../components/Alert.svelte'
   import Swal from 'sweetalert2'
 
@@ -15,6 +16,7 @@
   let currentPage = 1
   let totalPages = 1
   let successMessage = ''
+  let auditoriaMap = {} // idCliente -> {nombreUsuario, fechaAccion}
 
   onMount(async () => {
     cargarDatos()
@@ -28,22 +30,39 @@
     totalPages = Math.ceil(filteredClientes.length / ITEMS_PER_PAGE) || 1
   }
 
-  // Normaliza el cliente eliminado (viene de /clientes, no de eliminaciones)
-  const normalizeEliminado = (c) => ({
-    id: c.id,
-    clienteEliminadoId: c.id,
-    nombre: (c.nombre ? c.nombre : '') + (c.apellido ? ' ' + c.apellido : ''),
-    documento: c.documento || '-',
-    email: c.email || '-',
-    telefono: c.telefono || '-',
-    eliminadoPor: '-', // No hay campo de admin eliminador en clientes
-    tipoEliminacion: 'Desactivación',
-    fechaEliminacion: c.fechaEliminacion || null
-  })
+  // Normaliza el cliente eliminado y cruza con auditoría si existe
+  const normalizeEliminado = (c) => {
+    const aud = auditoriaMap[c.id]
+    return {
+      id: c.id,
+      clienteEliminadoId: c.id,
+      nombre: (c.nombre ? c.nombre : '') + (c.apellido ? ' ' + c.apellido : ''),
+      documento: c.documento || '-',
+      email: c.email || '-',
+      telefono: c.telefono || '-',
+      eliminadoPor: aud?.nombreUsuario || '-',
+      tipoEliminacion: 'Desactivación',
+      fechaEliminacion: aud?.fechaAccion || c.fechaEliminacion || null
+    }
+  }
 
   const cargarDatos = async () => {
     loading = true
     try {
+      // 1. Cargar auditoría de eliminaciones
+      const auditoria = await auditoriaService.getEliminacionesClientes()
+      auditoriaMap = {}
+      if (Array.isArray(auditoria)) {
+        for (const a of auditoria) {
+          if (a.registroAfectadoId) {
+            auditoriaMap[a.registroAfectadoId] = {
+              nombreUsuario: a.nombreUsuario,
+              fechaAccion: a.fechaAccion
+            }
+          }
+        }
+      }
+      // 2. Cargar clientes eliminados y cruzar con auditoría
       let data = await clienteService.getEliminados()
       data = Array.isArray(data) ? data : []
       clientesEliminados = data.map(normalizeEliminado)

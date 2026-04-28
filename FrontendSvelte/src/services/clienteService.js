@@ -28,8 +28,8 @@ const clienteService = {
   },
 
   restaurar(clienteId) {
-    // Reactiva el cliente (igual que update pero solo cambia activo)
-    return httpClient.put(`/clientes/${clienteId}`, { activo: true })
+    // Reactiva el cliente y borra la fecha de eliminación
+    return httpClient.put(`/clientes/${clienteId}`, { activo: true, fechaEliminacion: null })
   }
 }
 
