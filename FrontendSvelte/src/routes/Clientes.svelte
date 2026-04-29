@@ -133,6 +133,7 @@
     if (!term) {
       filteredClientes = [...clientes]
     } else {
+      const palabras = term.split(/\s+/).filter(Boolean)
       filteredClientes = clientes.filter(c => {
         const nombre = (c.nombre || '').toLowerCase()
         const apellido = (c.apellido || '').toLowerCase()
@@ -142,16 +143,20 @@
         const documento = (c.documento || '').replace(/[^0-9]/g, '')
         const telefono = (c.telefono || '').replace(/[^0-9]/g, '')
         const buscaNumeros = !!termSinFormato
-        return (
-          nombre.includes(term) ||
-          apellido.includes(term) ||
-          email.includes(term) ||
-          correo.includes(term) ||
-          (buscaNumeros && (
-            cedula.includes(termSinFormato) ||
-            documento.includes(termSinFormato) ||
-            telefono.includes(termSinFormato)
-          ))
+        // Si el término tiene números, buscar en campos numéricos
+        if (buscaNumeros && (
+          cedula.includes(termSinFormato) ||
+          documento.includes(termSinFormato) ||
+          telefono.includes(termSinFormato)
+        )) {
+          return true
+        }
+        // Si el término tiene palabras, todas deben estar en algún campo de texto
+        return palabras.every(palabra =>
+          nombre.includes(palabra) ||
+          apellido.includes(palabra) ||
+          email.includes(palabra) ||
+          correo.includes(palabra)
         )
       })
     }
