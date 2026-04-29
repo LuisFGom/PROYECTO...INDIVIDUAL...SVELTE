@@ -133,6 +133,7 @@
     if (!term) {
       filteredClientes = [...clientes]
     } else {
+      const contieneArroba = term.includes('@')
       const palabras = term.split(/\s+/).filter(Boolean)
       filteredClientes = clientes.filter(c => {
         const nombre = (c.nombre || '').toLowerCase()
@@ -150,6 +151,10 @@
           telefono.includes(termSinFormato)
         )) {
           return true
+        }
+        // Si el término parece un correo, buscar solo en email/correo
+        if (contieneArroba) {
+          return email.includes(term) || correo.includes(term)
         }
         // Si el término tiene palabras, todas deben estar en algún campo de texto
         return palabras.every(palabra =>
