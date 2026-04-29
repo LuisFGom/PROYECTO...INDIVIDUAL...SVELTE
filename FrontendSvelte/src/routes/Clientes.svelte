@@ -87,6 +87,9 @@
     }
   }
 
+  // Reactividad para búsqueda: filtrar clientes cuando cambie searchTerm
+  $: if (clientes.length > 0) searchTerm, filterClientes()
+
   // Reactividad para paginación: recalcular cuando cambie filteredClientes o currentPage
   $: {
     console.log('[REACTIVIDAD] paginación actualizada - filteredClientes:', filteredClientes.length, 'currentPage:', currentPage)
@@ -125,31 +128,30 @@
   const filterClientes = () => {
     console.log('[BUSQUEDA] searchTerm:', searchTerm)
     console.log('[BUSQUEDA] clientes disponibles:', clientes.length)
-    
-    if (!searchTerm.trim()) {
+    const term = searchTerm.trim().toLowerCase()
+    const termSinFormato = searchTerm.replace(/[^0-9]/g, '')
+    if (!term) {
       filteredClientes = [...clientes]
     } else {
-      const term = searchTerm.toLowerCase()
-      const termSinFormato = searchTerm.replace(/[^0-9]/g, '')
-      
       filteredClientes = clientes.filter(c => {
-        // Convertir todos a string para evitar errores con números
-        const nombre = String(c.nombre || '').toLowerCase()
-        const apellido = String(c.apellido || '').toLowerCase()
-        const cedula = String(c.cedula || '').replace(/[^0-9]/g, '')
-        const documento = String(c.documento || '').replace(/[^0-9]/g, '')
-        const email = String(c.email || '').toLowerCase()
-        const correo = String(c.correo || '').toLowerCase()
-        const telefono = String(c.telefono || '').replace(/[^0-9]/g, '')
-        
+        const nombre = (c.nombre || '').toLowerCase()
+        const apellido = (c.apellido || '').toLowerCase()
+        const email = (c.email || '').toLowerCase()
+        const correo = (c.correo || '').toLowerCase()
+        const cedula = (c.cedula || '').replace(/[^0-9]/g, '')
+        const documento = (c.documento || '').replace(/[^0-9]/g, '')
+        const telefono = (c.telefono || '').replace(/[^0-9]/g, '')
+        const buscaNumeros = !!termSinFormato
         return (
           nombre.includes(term) ||
           apellido.includes(term) ||
-          cedula.includes(termSinFormato) ||
-          documento.includes(termSinFormato) ||
           email.includes(term) ||
           correo.includes(term) ||
-          telefono.includes(termSinFormato)
+          (buscaNumeros && (
+            cedula.includes(termSinFormato) ||
+            documento.includes(termSinFormato) ||
+            telefono.includes(termSinFormato)
+          ))
         )
       })
     }

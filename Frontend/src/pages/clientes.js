@@ -185,19 +185,34 @@ export class Clientes {
   }
 
   filterClientes() {
+    console.log('[CLIENTES][filterClientes] searchTerm:', this.searchTerm)
     if (!this.searchTerm.trim()) {
       this.filteredClientes = [...this.clientes]
+      console.log('[CLIENTES][filterClientes] Sin filtro, total:', this.filteredClientes.length)
     } else {
       const term = this.searchTerm.toLowerCase()
-      const termSinFormato = this.searchTerm.replace(/[^0-9]/g, '') // Para buscar sin formato
-      this.filteredClientes = this.clientes.filter(c =>
-        c.nombre?.toLowerCase().includes(term) ||
-        c.cedula?.includes(term) ||
-        c.documento?.includes(term) ||
-        c.email?.toLowerCase().includes(term) ||
-        c.correo?.toLowerCase().includes(term) ||
-        c.telefono?.replace(/[^0-9]/g, '').includes(termSinFormato) // Buscar por teléfono sin formato
-      )
+      const termSinFormato = this.searchTerm.replace(/[^0-9]/g, '')
+      this.filteredClientes = this.clientes.filter((c, idx) => {
+        const nombre = (c.nombre || '').toLowerCase()
+        const documento = (c.documento || '').toLowerCase()
+        const cedula = (c.cedula || '').toLowerCase()
+        const email = (c.email || '').toLowerCase()
+        const correo = (c.correo || '').toLowerCase()
+        const telefono = (c.telefono || '').replace(/[^0-9]/g, '')
+        const match =
+          nombre.includes(term) ||
+          documento.includes(term) ||
+          cedula.includes(term) ||
+          email.includes(term) ||
+          correo.includes(term) ||
+          telefono.includes(termSinFormato)
+        if (match) {
+          console.log(`[CLIENTES][filterClientes][MATCH] idx:${idx} nombre:${nombre} documento:${documento} cedula:${cedula} email:${email} correo:${correo} telefono:${telefono}`)
+        }
+        return match
+      })
+      console.log('[CLIENTES][filterClientes] Filtrados:', this.filteredClientes.length)
+    }
     }
   }
 
