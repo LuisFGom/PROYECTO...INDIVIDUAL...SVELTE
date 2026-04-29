@@ -1,4 +1,3 @@
-
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +31,31 @@ namespace PuntoVenta.Api.Controllers
         {
             var productos = await _unitOfWork.Productos.GetAllAsync();
             return Ok(productos);
+        }
+
+        [Authorize]
+        [HttpGet("eliminados")]
+        public async Task<IActionResult> GetEliminados()
+        {
+            var productos = await _unitOfWork.Productos.GetAllAsync();
+            var eliminados = productos
+                .Where(p => !p.Activo)
+                .Select(p => new {
+                    p.Id,
+                    p.Codigo,
+                    p.Nombre,
+                    p.PrecioCompra,
+                    p.Precio,
+                    p.Stock,
+                    p.StockMinimo,
+                    p.Descripcion,
+                    p.PorcentajeIVA,
+                    p.Activo,
+                    p.FechaCreacion,
+                    p.FechaActualizacion
+                })
+                .ToList();
+            return Ok(eliminados);
         }
 
         [Authorize(Roles = "Administrador,Admin")]
