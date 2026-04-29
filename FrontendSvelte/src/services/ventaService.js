@@ -5,6 +5,23 @@ const ventaService = {
     return httpClient.get('/ventas')
   },
 
+  // Obtener facturas eliminadas
+  getEliminadas(params = {}) {
+    // params: { fechaInicio, fechaFin, clienteId, numeroFactura }
+    const query = []
+    if (params.fechaInicio) query.push(`fechaInicio=${encodeURIComponent(params.fechaInicio)}`)
+    if (params.fechaFin) query.push(`fechaFin=${encodeURIComponent(params.fechaFin)}`)
+    if (params.clienteId) query.push(`clienteId=${params.clienteId}`)
+    if (params.numeroFactura) query.push(`numeroFactura=${encodeURIComponent(params.numeroFactura)}`)
+    const qs = query.length ? `?${query.join('&')}` : ''
+    return httpClient.get(`/ventas/eliminadas/lista${qs}`)
+  },
+
+  // Restaurar factura eliminada
+  restaurar(id) {
+    return httpClient.put(`/ventas/${id}/reinsertar`)
+  },
+
   getById(id) {
     return httpClient.get(`/ventas/${id}`)
   },

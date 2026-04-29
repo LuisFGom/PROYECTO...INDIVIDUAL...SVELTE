@@ -1,7 +1,7 @@
 // Servicio de Productos
 import { httpClient } from './http-client.js'
 
-const ENDPOINT_PRODUCTOS = '/productos'
+const ENDPOINT_PRODUCTOS = '/Product'
 
 // Función auxiliar para normalizar datos del backend
 const normalizeProducto = (p) => ({
@@ -22,7 +22,7 @@ const normalizeProducto = (p) => ({
 export const productoService = {
   async getAll() {
     try {
-      const response = await httpClient.get(ENDPOINT_PRODUCTOS)
+      const response = await httpClient.get('/Product')
       const productos = response?.data || response || []
       return Array.isArray(productos) ? productos.map(normalizeProducto) : []
     } catch (error) {
@@ -33,7 +33,7 @@ export const productoService = {
 
   async getById(id) {
     try {
-      const response = await httpClient.get(`${ENDPOINT_PRODUCTOS}/${id}`)
+      const response = await httpClient.get(`/Product/${id}`)
       return response?.data ? normalizeProducto(response.data) : response?.data || null
     } catch (error) {
       console.error('[productoService] Error en getById:', error)
@@ -52,7 +52,7 @@ export const productoService = {
       stockMinimo: productoData.stockMinimo || 10,
       porcentajeIVA: productoData.porcentajeIVA || 0
     }
-    const response = await httpClient.post(ENDPOINT_PRODUCTOS, payload)
+    const response = await httpClient.post('/Product', payload)
     return response?.data || response || null
   },
 
@@ -67,18 +67,18 @@ export const productoService = {
       stockMinimo: productoData.stockMinimo,
       porcentajeIVA: productoData.porcentajeIVA || 0
     }
-    const response = await httpClient.put(`${ENDPOINT_PRODUCTOS}/${id}`, payload)
+    const response = await httpClient.put(`/Product/${id}`, payload)
     return response?.data || response || null
   },
 
   async delete(id) {
-    const response = await httpClient.delete(`${ENDPOINT_PRODUCTOS}/${id}`)
+    const response = await httpClient.delete(`/Product/${id}`)
     return response?.data || response || true
   },
 
   async getDisponibles() {
     try {
-      const response = await httpClient.get(`${ENDPOINT_PRODUCTOS}/disponibles`)
+      const response = await httpClient.get(`/Product/disponibles`)
       const productos = response?.data || response || []
       return Array.isArray(productos) ? productos.map(normalizeProducto) : []
     } catch (error) {
@@ -89,7 +89,7 @@ export const productoService = {
 
   async search(term, limit = 20) {
     try {
-      const response = await httpClient.get(`${ENDPOINT_PRODUCTOS}/search?term=${encodeURIComponent(term)}&limit=${limit}`)
+      const response = await httpClient.get(`/Product/search?term=${encodeURIComponent(term)}&limit=${limit}`)
       const productos = response?.data || response || []
       return Array.isArray(productos) ? productos.map(normalizeProducto) : []
     } catch (error) {

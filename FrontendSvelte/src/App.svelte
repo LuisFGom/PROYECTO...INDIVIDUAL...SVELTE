@@ -13,7 +13,7 @@
   import ElimUsuarios from './routes/ElimUsuarios.svelte'
   import ElimClientes from './routes/ElimClientes.svelte'
   import ElimProductos from './routes/ElimProductos.svelte'
-  import ElimFacturas from './routes/ElimFacturas.svelte'
+
   import Logs from './routes/Logs.svelte'
 
   let authState = {}
@@ -171,15 +171,7 @@
             </button>
           </li>
 
-          <li>
-            <button
-              on:click={() => handleNavigate('elim-facturas')}
-              class="menu-item {currentPage === 'elim-facturas' ? 'active' : ''}"
-            >
-              <i class="fas fa-receipt"></i>
-              <span>Elim. Facturas</span>
-            </button>
-          </li>
+
 
           <!-- Separador -->
           <li class="menu-separator"></li>
@@ -229,8 +221,7 @@
             <ElimClientes />
           {:else if currentPage === 'elim-productos'}
             <ElimProductos />
-          {:else if currentPage === 'elim-facturas'}
-            <ElimFacturas />
+
           {:else if currentPage === 'logs'}
             <Logs />
           {/if}

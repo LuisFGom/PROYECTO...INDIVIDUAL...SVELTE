@@ -1,3 +1,4 @@
+
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,56 +9,29 @@ using PuntoVenta.Application.Features.Products.Queries.GetProducts;
 using PuntoVenta.Application.Features.Auditorias.Commands;
 using PuntoVenta.Application.Interfaces;
 using PuntoVenta.Domain.Entities;
-using System;
-using System.Security.Claims;
+
 
 namespace PuntoVenta.Api.Controllers
 {
-    [Authorize]
-    [Route("api/productos")]
     [ApiController]
-    public class ProductosController : ControllerBase
+    [Route("api/[controller]")]
+    public class ProductController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductosController(IMediator mediator, IUnitOfWork unitOfWork)
+        public ProductController(IMediator mediator, IUnitOfWork unitOfWork)
         {
             _mediator = mediator;
             _unitOfWork = unitOfWork;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetProductos()
         {
-            var productos = await _mediator.Send(new GetProductsQuery());
-            return Ok(productos);
-        }
-
-        // NUEVO ENDPOINT: Productos eliminados (inactivos o con fecha de eliminación)
-        [HttpGet("eliminados")]
-        public async Task<IActionResult> GetProductosEliminados()
-        {
             var productos = await _unitOfWork.Productos.GetAllAsync();
-            var eliminados = productos
-                .Where(p => p is { Activo: false } || (p.GetType().GetProperty("FechaEliminacion")?.GetValue(p) != null))
-                .Select(p => new {
-                    p.Id,
-                    p.Codigo,
-                    p.Nombre,
-                    p.PrecioCompra,
-                    p.Precio,
-                    p.Stock,
-                    p.StockMinimo,
-                    p.Descripcion,
-                    p.PorcentajeIVA,
-                    p.FechaCreacion,
-                    p.FechaActualizacion,
-                    p.Activo,
-                    FechaEliminacion = p.GetType().GetProperty("FechaEliminacion")?.GetValue(p)
-                })
-                .ToList();
-            return Ok(eliminados);
+            return Ok(productos);
         }
 
         [Authorize(Roles = "Administrador,Admin")]
@@ -67,13 +41,13 @@ namespace PuntoVenta.Api.Controllers
             try
             {
                 // Agregar información del usuario
-                command.UsuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "desconocido";
-                var nombre = User.FindFirst(ClaimTypes.Name)?.Value ?? "";
-                var apellido = User.FindFirst(ClaimTypes.Surname)?.Value ?? "";
+                command.UsuarioId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "desconocido";
+                var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "";
+                var apellido = User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
                 command.NombreUsuario = $"{nombre} {apellido}".Trim();
 
                 var id = await _mediator.Send(command);
-                return CreatedAtAction(nameof(GetProductos), new { id }, new { Message = $"Producto creado con ID: {id}" });
+                return CreatedAtAction(nameof(CrearProducto), new { id }, new { Message = $"Producto creado con ID: {id}" });
             }
             catch (Exception ex)
             {
@@ -94,9 +68,9 @@ namespace PuntoVenta.Api.Controllers
             if (id != command.Id) return BadRequest();
 
             // Agregar información del usuario
-            command.UsuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "desconocido";
-            var nombre = User.FindFirst(ClaimTypes.Name)?.Value ?? "";
-            var apellido = User.FindFirst(ClaimTypes.Surname)?.Value ?? "";
+            command.UsuarioId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "desconocido";
+            var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "";
+            var apellido = User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
             command.NombreUsuario = $"{nombre} {apellido}".Trim();
             
             await _mediator.Send(command);
@@ -117,10 +91,10 @@ namespace PuntoVenta.Api.Controllers
                 }
 
                 // Obtener información del administrador
-                var adminId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-                var adminIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "desconocido";
-                var nombre = User.FindFirst(ClaimTypes.Name)?.Value ?? "";
-                var apellido = User.FindFirst(ClaimTypes.Surname)?.Value ?? "";
+                var adminId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+                var adminIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "desconocido";
+                var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "";
+                var apellido = User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
                 var adminNombre = $"{nombre} {apellido}".Trim();
                 if (string.IsNullOrWhiteSpace(adminNombre)) adminNombre = "Sistema";
 
