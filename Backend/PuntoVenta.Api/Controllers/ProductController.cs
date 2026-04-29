@@ -177,5 +177,24 @@ namespace PuntoVenta.Api.Controllers
                 return BadRequest(new { mensaje = ex.Message });
             }
         }
+
+        [Authorize(Roles = "Administrador,Admin")]
+        [HttpPut("{id}/restaurar")]
+        public async Task<IActionResult> RestaurarProducto(int id)
+        {
+            var producto = await _unitOfWork.Productos.GetByIdAsync(id);
+            if (producto == null)
+            {
+                return NotFound(new { mensaje = "Producto no encontrado" });
+            }
+            if (producto.Activo)
+            {
+                return BadRequest(new { mensaje = "El producto ya está activo" });
+            }
+            producto.Activo = true;
+            await _unitOfWork.Productos.UpdateAsync(producto);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(new { mensaje = "Producto restaurado correctamente" });
+        }
     }
 }
