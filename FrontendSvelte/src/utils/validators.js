@@ -2,7 +2,9 @@
 export const validators = {
   isEmail(email) {
     if (!email || email.trim() === '') return true // Email es opcional
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    // Antes del @: letras, números, punto, guión, guión bajo
+    // Después del @: formato estándar
+    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     return re.test(email)
   },
 

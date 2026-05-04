@@ -624,14 +624,43 @@
           </div>
 
           <div class="form-row">
-            <FormInput
-              label="Email"
-              name="email"
-              type="email"
-              bind:value={formData.email}
-              placeholder="correo@ejemplo.com"
-              error={errors.email}
-            />
+            <div>
+              <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #0F172A;">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={formData.email}
+                on:keypress={(e) => {
+                  // Solo permitir: letras, números, punto, guión, guión bajo, @, Backspace, Enter
+                  const charPermitido = /[a-zA-Z0-9._\-@]/.test(e.key)
+                  if (!charPermitido && e.key !== 'Backspace' && e.key !== 'Enter' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Delete') {
+                    e.preventDefault()
+                  }
+                }}
+                on:input={(e) => {
+                  // Limpieza adicional por si acaso (para paste)
+                  let valor = e.target.value
+                  const partes = valor.split('@')
+                  if (partes.length > 1) {
+                    let antes = partes[0].replace(/[^a-zA-Z0-9._\-]/g, '')
+                    let despues = partes.slice(1).join('@')
+                    valor = antes + '@' + despues
+                  } else {
+                    valor = valor.replace(/[^a-zA-Z0-9._\-@]/g, '')
+                  }
+                  formData.email = valor
+                }}
+                placeholder="correo@ejemplo.com"
+                style="width: 100%; padding: 0.625rem; border: 1px solid {errors.email ? '#ef4444' : '#E2E8F0'}; border-radius: 0.375rem; box-sizing: border-box;"
+              />
+              {#if errors.email}
+                <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{errors.email}</div>
+              {:else}
+                <div style="color: #64748B; font-size: 0.75rem; margin-top: 0.25rem;">Símbolos permitidos: letras, números, punto (.), guión (-), guión bajo (_)</div>
+              {/if}
+            </div>
           </div>
 
           <div class="form-row">
