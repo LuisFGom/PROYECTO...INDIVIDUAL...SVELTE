@@ -123,8 +123,8 @@
         errors.nombreUsuario = 'El nombre de usuario es requerido'
       } else if (formData.nombreUsuario.length < 3) {
         errors.nombreUsuario = 'El nombre de usuario debe tener mínimo 3 caracteres'
-      } else if (!/^[a-z0-9_.-]+$/.test(formData.nombreUsuario)) {
-        errors.nombreUsuario = 'Solo se permiten letras minúsculas, números, guiones y guiones bajos'
+      } else if (!/^[a-zA-Z\-_]+$/.test(formData.nombreUsuario)) {
+        errors.nombreUsuario = 'Solo se permiten letras, guiones (-) y guiones bajos (_)'
       }
     }
 
@@ -248,7 +248,14 @@
       resetForm()
       await loadUsuarios()
     } catch (error) {
-      await Swal.fire('Error', error.message, 'error')
+      let mensajeError = error.message
+      
+      // Limpiar mensajes de error del backend
+      if (mensajeError.includes('Ya existe un usuario')) {
+        mensajeError = 'El nombre de usuario ya se encuentra en uso'
+      }
+      
+      await Swal.fire('Error', mensajeError, 'error')
     }
   }
 
@@ -455,6 +462,19 @@
               required
               maxlength={20}
               disabled={editingUsuarioId ? true : false}
+              on:keypress={(e) => {
+                if (!/[a-zA-Z_-]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              on:input={(e) => {
+                formData.nombreUsuario = formData.nombreUsuario.replace(/[^a-zA-Z_-]/g, '')
+              }}
+              on:paste={(e) => {
+                e.preventDefault()
+                const paste = (e.clipboardData || window.clipboardData).getData('text')
+                formData.nombreUsuario = paste.replace(/[^a-zA-Z_-]/g, '')
+              }}
             />
           </div>
 
@@ -488,6 +508,19 @@
               placeholder="usuario@ejemplo.com"
               error={errors.email}
               required
+              on:keypress={(e) => {
+                if (!/[a-zA-Z0-9.@]/.test(e.key)) {
+                  e.preventDefault()
+                }
+              }}
+              on:input={(e) => {
+                formData.email = formData.email.replace(/[^a-zA-Z0-9.@]/g, '')
+              }}
+              on:paste={(e) => {
+                e.preventDefault()
+                const paste = (e.clipboardData || window.clipboardData).getData('text')
+                formData.email = paste.replace(/[^a-zA-Z0-9.@]/g, '')
+              }}
             />
           </div>
 

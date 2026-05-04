@@ -728,7 +728,7 @@ namespace PuntoVenta.Api.Controllers
                     row.RelativeItem().Column(col =>
                     {
                         col.Item().Text($"Número de Factura: {factura.NumeroFactura ?? "N/A"}").Bold();
-                        col.Item().Text($"Fecha: {factura.FechaVenta:dd/MM/yyyy HH:mm}");
+                        col.Item().Text($"Fecha: {factura.FechaVenta:dd/MM/yyyy HH:mm:ss}");
                         col.Item().Text($"Estado: {factura.Estado ?? "N/A"}");
                     });
 

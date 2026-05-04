@@ -61,6 +61,9 @@
   let productoSeleccionado = null
   let cantidadAAgregar = 1
 
+  // Hora actual en tiempo real
+  let horaActual = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+
   // Cálculos reactivos
   $: subtotal = newFactura.productosAgregados.reduce((sum, p) => sum + (p.precioUnitario * p.cantidad), 0)
   $: ivaCalculado = (subtotal * 0.19)
@@ -288,10 +291,17 @@
       // Extraer solo los dígitos del número de factura (ej: "FAC-1010029" → "1010029")
       const numeroFacturaLimpio = newFactura.numeroFactura.replace('FAC-', '')
       
+      // Combinar fecha con hora actual para tener timestamp completo
+      const ahora = new Date()
+      const fechaConHora = new Date(newFactura.fecha)
+      fechaConHora.setHours(ahora.getHours())
+      fechaConHora.setMinutes(ahora.getMinutes())
+      fechaConHora.setSeconds(ahora.getSeconds())
+      
       const dataToSend = {
         numeroFactura: numeroFacturaLimpio,
         clienteId: newFactura.cliente.id,
-        fechaVenta: new Date(newFactura.fecha),
+        fechaVenta: fechaConHora.toISOString(),
         detalles: newFactura.productosAgregados.map(p => ({
           productoId: p.id,
           cantidad: p.cantidad,
@@ -390,16 +400,17 @@
 
   const abrirPdfModal = (venta) => {
     ventaParaPdf = venta
-    const hoy = new Date()
+    const hoy = new Date(venta.fechaVenta)
     const fecha = hoy.toLocaleDateString('es-ES')
-    nombrePdf = `Factura ${venta.id} ${fecha}`
+    const hora = hoy.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    nombrePdf = `Factura ${venta.numeroFactura} ${fecha} ${hora}`
     showPdfModal = true
   }
 
   const descargarPdf = async () => {
     try {
       // Aquí se descargaría con el nombre personalizado
-      await ventaService.downloadPdf(ventaParaPdf.id)
+      await ventaService.downloadPdf(ventaParaPdf.id, nombrePdf)
       successMessage = 'PDF descargado correctamente'
       setTimeout(() => { successMessage = '' }, 3000)
       showPdfModal = false
@@ -412,6 +423,14 @@
   onMount(() => {
     console.log('Ventas.svelte montado')
     loadVentas()
+    
+    // Intervalo para actualizar la hora cada segundo
+    const intervaloHora = setInterval(() => {
+      horaActual = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    }, 1000)
+    
+    // Limpiar intervalo cuando se desmonta el componente
+    return () => clearInterval(intervaloHora)
   })
 
   const abrirNuevaFactura = () => {
@@ -574,7 +593,7 @@
     <div class="card">
       <div class="card-body">
         <!-- Datos de Factura -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
           <div class="form-group">
             <label style="font-size: 16px; font-weight: 700;">Número de Factura:</label>
             <input type="text" disabled value={newFactura.numeroFactura} style="font-size: 24px; font-weight: 700; padding: 1rem; background: #F3F4F6;" />
@@ -582,6 +601,10 @@
           <div class="form-group">
             <label style="font-size: 16px; font-weight: 700;">Fecha:</label>
             <input type="date" disabled value={newFactura.fecha} style="font-size: 24px; font-weight: 700; padding: 1rem; background: #F3F4F6;" />
+          </div>
+          <div class="form-group">
+            <label style="font-size: 16px; font-weight: 700;">Hora:</label>
+            <input type="text" disabled value={horaActual} style="font-size: 24px; font-weight: 700; padding: 1rem; background: #F3F4F6; text-align: center;" />
           </div>
         </div>
 
@@ -864,7 +887,7 @@
         <div class="modal-body">
           <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #E5E7EB;">
             <div style="margin-bottom: 0.5rem;">
-              <strong>Fecha:</strong> {formatters.formatDate(detallesFactura.fechaVenta)}
+              <strong>Fecha y Hora:</strong> {formatters.formatDateTime(detallesFactura.fechaVenta)}
             </div>
             <div style="margin-bottom: 0.5rem;">
               <strong>Cliente:</strong> {detallesFactura.cliente?.nombre || 'N/A'}

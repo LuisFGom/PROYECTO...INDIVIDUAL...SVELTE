@@ -38,7 +38,7 @@ const ventaService = {
     return httpClient.delete(`/ventas/${id}`)
   },
 
-  async downloadPdf(id) {
+  async downloadPdf(id, nombreArchivo = null) {
     try {
       const response = await fetch(`http://localhost:5000/api/ventas/${id}/pdf`, {
         method: 'GET',
@@ -55,7 +55,7 @@ const ventaService = {
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `venta-${id}.pdf`
+      link.download = nombreArchivo ? `${nombreArchivo}.pdf` : `venta-${id}.pdf`
       link.click()
       window.URL.revokeObjectURL(url)
     } catch (error) {

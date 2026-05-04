@@ -49,6 +49,9 @@
       on:change={handleChange}
       on:blur={handleBlur}
       on:input={handleChange}
+      on:keypress
+      on:paste
+      on:keydown
     />
   {:else if type === 'password'}
     <input
@@ -63,6 +66,9 @@
       on:change={handleChange}
       on:blur={handleBlur}
       on:input={handleChange}
+      on:keypress
+      on:paste
+      on:keydown
     />
   {:else if type === 'tel'}
     <input
@@ -77,6 +83,9 @@
       on:change={handleChange}
       on:blur={handleBlur}
       on:input={handleChange}
+      on:keypress
+      on:paste
+      on:keydown
     />
   {:else if type === 'number'}
     <input
@@ -91,6 +100,9 @@
       on:change={handleChange}
       on:blur={handleBlur}
       on:input={handleChange}
+      on:keypress
+      on:paste
+      on:keydown
     />
   {:else}
     <input
@@ -105,6 +117,9 @@
       on:change={handleChange}
       on:blur={handleBlur}
       on:input={handleChange}
+      on:keypress
+      on:paste
+      on:keydown
     />
   {/if}
   {#if error}

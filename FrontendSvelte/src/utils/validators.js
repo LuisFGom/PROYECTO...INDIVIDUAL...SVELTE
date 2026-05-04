@@ -87,6 +87,14 @@ export const formatters = {
     return d.toLocaleDateString('es-ES')
   },
 
+  formatDateTime(date) {
+    if (!date) return ''
+    const d = new Date(date)
+    const fechaFormato = d.toLocaleDateString('es-ES')
+    const horaFormato = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    return `${fechaFormato} ${horaFormato}`
+  },
+
   formatCurrency(amount) {
     if (!amount) return '$0.00'
     const numero = parseFloat(amount).toFixed(2)
