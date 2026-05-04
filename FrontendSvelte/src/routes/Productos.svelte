@@ -61,8 +61,14 @@
       cantidad: producto.stockInicial !== undefined ? producto.stockInicial : (producto.stock !== undefined ? producto.stock : (producto.cantidad || 0)),
       stock: producto.stockInicial !== undefined ? producto.stockInicial : (producto.stock !== undefined ? producto.stock : (producto.cantidad || 0)),
       // Mapear IVA - importante: conservar 0 si es 0, no confundir con undefined
-      // NOTA: El backend devuelve "porcentajeIVA" con mayúsculas
-      iva: producto.porcentajeIVA !== undefined ? producto.porcentajeIVA : (producto.iva !== undefined ? producto.iva : 0)
+      // Intenta: porcentajeIVA, PorcentajeIVA, iva, IVA
+      iva: producto.porcentajeIVA !== undefined ? producto.porcentajeIVA : 
+           (producto.PorcentajeIVA !== undefined ? producto.PorcentajeIVA : 
+           (producto.iva !== undefined ? producto.iva : 
+           (producto.IVA !== undefined ? producto.IVA : 0))),
+      // Mapear fechas - intenta múltiples nombres del backend
+      fechaCreacion: producto.fechaCreacion || producto.FechaCreacion || producto.CreatedAt || producto.createdAt || '',
+      fechaModificacion: producto.fechaModificacion || producto.FechaModificacion || producto.FechaActualizacion || producto.fechaActualizacion || producto.UpdatedAt || producto.updatedAt || ''
     }
     return normalizado
   }
@@ -112,6 +118,19 @@
     currentPage = 1
   }
 
+  const filterProductosSilentMode = () => {
+    // Filtrar sin resetear página (modo silencioso)
+    if (!searchTerm.trim()) {
+      filteredProductos = [...productos]
+    } else {
+      const term = searchTerm.toLowerCase()
+      filteredProductos = productos.filter(p =>
+        String(p.nombre || '').toLowerCase().includes(term) ||
+        String(p.descripcion || '').toLowerCase().includes(term)
+      )
+    }
+  }
+
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
       currentPage = page
@@ -121,10 +140,53 @@
   const validateForm = () => {
     errors = {}
     if (!formData.nombre?.trim()) errors.nombre = 'El nombre es requerido'
-    if (!formData.codigo?.trim()) errors.codigo = 'El código es requerido'
-    if (!formData.precioCosto || parseFloat(formData.precioCosto) <= 0) errors.precioCosto = 'El precio de compra debe ser mayor a 0'
-    if (!formData.precio || parseFloat(formData.precio) <= 0) errors.precio = 'El precio de venta debe ser mayor a 0'
-    if (!formData.cantidad || parseInt(formData.cantidad) < 0) errors.cantidad = 'La cantidad debe ser un número positivo'
+    
+    // Solo validar código cuando es CREACIÓN (no cuando es edición)
+    if (!editingProductoId) {
+      if (!formData.codigo?.trim()) errors.codigo = 'El código es requerido'
+      // Validar que código tenga exactamente 8 caracteres
+      if (formData.codigo?.trim() && formData.codigo.trim().length !== 8) {
+        errors.codigo = 'El código debe tener exactamente 8 caracteres'
+      }
+      // Validar que código sea mezcla de letras y números (no solo uno)
+      if (formData.codigo?.trim()) {
+        const tieneLetras = /[a-zA-Z]/.test(formData.codigo)
+        const tieneNumeros = /[0-9]/.test(formData.codigo)
+        if (!tieneLetras || !tieneNumeros) {
+          errors.codigo = 'El código debe contener letras Y números (no solo uno)'
+        }
+      }
+    }
+    
+    const precioCosto = parseFloat(formData.precioCosto) || 0
+    const precioVenta = parseFloat(formData.precio) || 0
+    
+    // Validar precio de compra
+    if (!formData.precioCosto || precioCosto <= 0) {
+      errors.precioCosto = 'El precio de compra debe ser mayor a 0'
+    }
+    
+    // Validar precio de venta
+    if (!formData.precio || precioVenta <= 0) {
+      errors.precio = 'El precio de venta debe ser mayor a 0'
+    }
+    
+    // Validar que precio de compra no sea mayor al precio de venta
+    if (precioCosto > 0 && precioVenta > 0 && precioCosto > precioVenta) {
+      errors.precioCosto = 'El precio de compra no puede ser mayor al precio de venta'
+    }
+    
+    const cantidadVal = parseInt(formData.cantidad) || 0
+    const stockMinimoVal = parseInt(formData.stockMinimo) || 0
+    
+    if (!formData.cantidad || cantidadVal < 0) {
+      errors.cantidad = 'La cantidad debe ser un número positivo'
+    }
+    // Validar que Stock Inicial sea >= Stock Mínimo
+    if (formData.cantidad && formData.stockMinimo && cantidadVal < stockMinimoVal) {
+      errors.cantidad = errors.cantidad ? errors.cantidad + ' / El Stock Inicial no puede ser menor que el Stock Mínimo' : 'El Stock Inicial no puede ser menor que el Stock Mínimo'
+    }
+    
     return Object.keys(errors).length === 0
   }
 
@@ -140,12 +202,13 @@
       precio: normalized.precio ? parseFloat(normalized.precio) : '',
       cantidad: normalized.cantidad ? parseInt(normalized.cantidad) : '',
       stockMinimo: normalized.stockMinimo ? parseInt(normalized.stockMinimo) : 0,
-      iva: normalized.iva ? parseFloat(normalized.iva) : 0
+      iva: normalized.iva !== undefined && normalized.iva !== null ? parseFloat(normalized.iva) : 0
     }
     console.log('=== EDITAR PRODUCTO ===')
     console.log('Campos del producto del backend:')
     console.log('  - porcentajeIVA:', producto.porcentajeIVA, '(usado en normalización)')
     console.log('  - iva:', producto.iva, '(alternativa)')
+    console.log('Normalized IVA:', normalized.iva)
     console.log('FormData final - iva:', formData.iva)
     showFormModal = true
   }
@@ -161,10 +224,21 @@
 
     if (result.isConfirmed) {
       try {
+        const paginaActual = currentPage
         await productoService.delete(producto.id)
+        // Eliminar del array sin recargar
+        productos = productos.filter(p => p.id !== producto.id)
+        filterProductosSilentMode() // Recalcular sin ir a página 1
+        // Calcular cuántas páginas hay después de la eliminación
+        const totalPaginasAhora = Math.ceil(filteredProductos.length / ITEMS_PER_PAGE) || 1
+        // Si la página actual es > total de páginas, ir a la última página
+        if (paginaActual > totalPaginasAhora) {
+          currentPage = totalPaginasAhora
+        } else {
+          currentPage = paginaActual
+        }
         successMessage = 'Producto eliminado correctamente'
         setTimeout(() => { successMessage = '' }, 3000)
-        await loadProductos()
       } catch (error) {
         await Swal.fire('Error', error.message, 'error')
       }
@@ -213,27 +287,107 @@
       let productoNuevoId = null
       
       if (editingProductoId) {
+        // ACTUALIZACIÓN: actualizar en la lista sin recargarse, mantener página actual
         respuesta = await productoService.update(editingProductoId, dataToSend)
-        successMessage = 'Producto actualizado correctamente'
-      } else {
-        respuesta = await productoService.create(dataToSend)
-        successMessage = 'Producto creado correctamente'
+        console.log('=== RESPUESTA UPDATE COMPLETA ===')
+        console.log('Respuesta:', JSON.stringify(respuesta))
         
-        // Extraer ID del mensaje devuelto por el backend
-        const idMatch = respuesta?.message?.match(/ID:\s*(\d+)/)
-        if (idMatch && idMatch[1]) {
-          productoNuevoId = parseInt(idMatch[1])
-          console.log('ID del nuevo producto extraído:', productoNuevoId)
+        const index = productos.findIndex(p => p.id === editingProductoId)
+        if (index !== -1) {
+          // Si success: true, usar los datos que enviamos (dataToSend) para actualizar
+          let productoActualizadoData = respuesta?.data || respuesta?.result || respuesta
+          
+          // Si solo viene success:true, usar los datos del formulario que enviamos
+          if (respuesta?.success === true && !productoActualizadoData?.nombre) {
+            console.log('Backend confirma éxito pero no devuelve datos. Usando dataToSend para actualizar.')
+            productoActualizadoData = {
+              id: editingProductoId,
+              nombre: dataToSend.nombre,
+              descripcion: dataToSend.descripcion,
+              precioVenta: dataToSend.precioVenta,
+              precioCompra: dataToSend.precioCompra,
+              stock: dataToSend.stock,
+              stockMinimo: dataToSend.stockMinimo,
+              PorcentajeIVA: dataToSend.PorcentajeIVA,
+              fechaModificacion: new Date().toISOString() // Fecha actual
+            }
+          }
+          
+          // Usar la respuesta del servidor que contiene fechaModificacion actualizada
+          const productoActualizado = normalizeProducto({
+            ...productos[index],
+            ...productoActualizadoData,
+            id: editingProductoId
+          })
+          
+          console.log('Producto actualizado:', {
+            nombre: productoActualizado.nombre,
+            precio: productoActualizado.precio,
+            precioCosto: productoActualizado.precioCosto,
+            cantidad: productoActualizado.cantidad,
+            fechaModificacion: productoActualizado.fechaModificacion
+          })
+          
+          // Actualizar el producto en el array
+          productos[index] = productoActualizado
+          
+          // IMPORTANTE: Reasignar el array para que Svelte detecte el cambio
+          productos = [...productos]
+          
+          console.log('Array actualizado - Nueva tabla debería verse con cambios')
+          
+          const paginaAntes = currentPage
+          filterProductosSilentMode() // Recalcular filtrado sin ir a página 1
+          currentPage = paginaAntes // Asegurar que la página se mantiene igual
         }
+        successMessage = 'Producto actualizado correctamente'
+        showFormModal = false // Cerrar modal inmediatamente
+      } else {
+        // CREACIÓN: agregar a la lista sin recargarse, ir a página 1
+        respuesta = await productoService.create(dataToSend)
+        
+        // Extraer ID del mensaje "Producto creado con ID: 200019"
+        const idMatch = respuesta?.message?.match(/ID:\s*(\d+)/)
+        const nuevoId = idMatch ? parseInt(idMatch[1]) : null
+        
+        if (nuevoId) {
+          // Construir el producto completo con los datos enviados + ID
+          const productoNuevo = normalizeProducto({
+            id: nuevoId,
+            nombre: dataToSend.nombre,
+            codigo: dataToSend.codigo,
+            descripcion: dataToSend.descripcion,
+            precio: dataToSend.precio,
+            precioVenta: dataToSend.precio,
+            precioCompra: dataToSend.precioCompra,
+            stockInicial: dataToSend.stockInicial,
+            stock: dataToSend.stockInicial,
+            stockMinimo: dataToSend.stockMinimo,
+            porcentajeIVA: dataToSend.PorcentajeIVA,
+            activo: true,
+            fechaCreacion: new Date().toISOString()
+          })
+          productos = [productoNuevo, ...productos] // Agregar al inicio
+        }
+        
+        searchTerm = ''
+        currentPage = 1
+        filterProductos(true) // Filtrar y mostrar en página 1
+        successMessage = 'Producto creado correctamente'
       }
       
       console.log('=== RESPUESTA DEL BACKEND ===')
       console.log('Mensaje:', respuesta?.message)
+      console.log('¿Tiene data?', !!respuesta?.data)
+      console.log('¿Tiene result?', !!respuesta?.result)
+      console.log('Propiedades de respuesta:', Object.keys(respuesta || {}).slice(0, 20).join(', '))
       
       setTimeout(() => { successMessage = '' }, 3000)
-      showFormModal = false
+      if (!editingProductoId) {
+        // Para creación, cerrar modal aquí (para UPDATE ya se cerró arriba)
+        showFormModal = false
+      }
       resetForm()
-      await loadProductos()
     } catch (error) {
       await Swal.fire('Error', error.message, 'error')
     }
@@ -403,8 +557,22 @@
               id="nombre"
               type="text"
               placeholder="Nombre del producto"
-              bind:value={formData.nombre}
+              value={formData.nombre}
+              maxlength="40"
+              on:keypress={(e) => {
+                // Solo permitir letras (incluyendo acentos) y espacios
+                const charPermitido = /[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(e.key)
+                if (!charPermitido && e.key !== 'Backspace' && e.key !== 'Enter' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Delete') {
+                  e.preventDefault()
+                }
+              }}
+              on:input={(e) => {
+                // Limpiar caracteres no permitidos (para paste)
+                let valor = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').substring(0, 40)
+                formData.nombre = valor
+              }}
             />
+            <small style="color: #64748B; font-size: 12px; display: block; margin-top: 3px;">Máximo 40 caracteres ({formData.nombre?.length || 0}/40)</small>
             {#if errors.nombre}
               <div class="error-text">{errors.nombre}</div>
             {/if}
@@ -417,9 +585,23 @@
               id="codigo"
               type="text"
               placeholder="Código único"
-              bind:value={formData.codigo}
+              value={formData.codigo}
+              maxlength="8"
+              on:keypress={(e) => {
+                // Solo permitir letras y números
+                const charPermitido = /[a-zA-Z0-9]/.test(e.key)
+                if (!charPermitido && e.key !== 'Backspace' && e.key !== 'Enter' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Delete') {
+                  e.preventDefault()
+                }
+              }}
+              on:input={(e) => {
+                // Limpiar caracteres no permitidos (para paste)
+                let valor = e.target.value.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8)
+                formData.codigo = valor
+              }}
               disabled={editingProductoId ? true : false}
             />
+            <small style="color: #64748B; font-size: 12px; display: block; margin-top: 3px;">Únicamente 8 caracteres entre números y letras</small>
             {#if errors.codigo}
               <div class="error-text">{errors.codigo}</div>
             {/if}
