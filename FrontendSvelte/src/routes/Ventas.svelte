@@ -228,9 +228,13 @@
   const confirmarAgregarProducto = () => {
     if (!productoSeleccionado) return
     
-    const cantidad = parseInt(cantidadAAgregar) || 1
-    if (cantidad < 1 || cantidad > productoSeleccionado.stock) {
-      Swal.fire('Error', `Cantidad inválida. Stock disponible: ${productoSeleccionado.stock}`, 'error')
+    const cantidad = parseInt(cantidadAAgregar) || 0
+    if (cantidad < 1) {
+      Swal.fire('Error', 'La cantidad mínima es 1', 'error')
+      return
+    }
+    if (cantidad > productoSeleccionado.stock) {
+      Swal.fire('Error', `Stock máximo disponible: ${productoSeleccionado.stock}`, 'error')
       return
     }
 
@@ -588,7 +592,7 @@
             <div style="background: #F0F9FF; border-left: 4px solid #3B82F6; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
               <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                 <div>
-                  <strong>ID:</strong> {newFactura.cliente.id}
+                  <strong>CI:</strong> {formatters.formatCedula(newFactura.cliente.cedula || newFactura.cliente.documento || '')}
                 </div>
                 <div>
                   <strong>Nombre:</strong> {newFactura.cliente.nombre}
@@ -729,9 +733,12 @@
           />
           <div style="max-height: 400px; overflow-y: auto;">
             {#each filteredClientes as cliente (cliente.id)}
-              <div class="cliente-item" on:click={() => seleccionarCliente(cliente)}>
-                <strong>ID: {cliente.id} - {cliente.nombre} {cliente.apellido || ''}</strong>
-                <div style="font-size: 12px; color: #6B7280;">
+              <div class="cliente-item" on:click={() => seleccionarCliente(cliente)} style="padding: 1rem 1.5rem; cursor: pointer;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <strong style="font-size: 15px;">CI: {(cliente.cedula || cliente.documento || '').replace(/[^0-9]/g, '')}</strong>
+                  <strong style="font-size: 15px; text-align: right; flex: 1; margin-left: 3rem;">Nombre: {cliente.nombre} {cliente.apellido || ''}</strong>
+                </div>
+                <div style="font-size: 12px; color: #6B7280; margin-top: 0.5rem; text-align: right;">
                   {cliente.email}
                 </div>
               </div>
@@ -1112,6 +1119,7 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding-left: 10px;
   }
 
   .modal {
@@ -1119,7 +1127,7 @@
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
     width: 90%;
-    max-width: 600px;
+    max-width: 900px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
