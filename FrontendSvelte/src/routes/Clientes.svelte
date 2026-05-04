@@ -45,41 +45,9 @@
       formData.apellido = apellidoFiltrado
     }
 
-    // Formatear cédula: solo números con máscara XX-XXX-XXX-X (SOLO SI NO ESTAMOS EDITANDO)
-    if (!editingClienteId) {
-      let numeros = formData.cedula.replace(/[^0-9]/g, '').substring(0, 10)
-      let cedulaFormateada = ''
-      if (numeros.length > 0) {
-        if (numeros.length <= 2) {
-          cedulaFormateada = numeros
-        } else if (numeros.length <= 5) {
-          cedulaFormateada = numeros.substring(0, 2) + '-' + numeros.substring(2)
-        } else if (numeros.length <= 8) {
-          cedulaFormateada = numeros.substring(0, 2) + '-' + numeros.substring(2, 5) + '-' + numeros.substring(5)
-        } else {
-          cedulaFormateada = numeros.substring(0, 2) + '-' + numeros.substring(2, 5) + '-' + numeros.substring(5, 8) + '-' + numeros.substring(8)
-        }
-      }
-      if (cedulaFormateada !== formData.cedula && (cedulaFormateada !== '' || formData.cedula !== '')) {
-        formData.cedula = cedulaFormateada
-      }
-    }
+    // La cédula se formatea en el evento on:input del input
 
-    // Formatear teléfono: solo números con máscara 09-XXXX-XXXX
-    let telefonoNumeros = formData.telefono.replace(/[^0-9]/g, '').substring(0, 10)
-    let telefonoFormateado = ''
-    if (telefonoNumeros.length > 0) {
-      if (telefonoNumeros.length <= 2) {
-        telefonoFormateado = telefonoNumeros
-      } else if (telefonoNumeros.length <= 6) {
-        telefonoFormateado = telefonoNumeros.substring(0, 2) + '-' + telefonoNumeros.substring(2)
-      } else {
-        telefonoFormateado = telefonoNumeros.substring(0, 2) + '-' + telefonoNumeros.substring(2, 6) + '-' + telefonoNumeros.substring(6)
-      }
-    }
-    if (telefonoFormateado !== formData.telefono && (telefonoFormateado !== '' || formData.telefono !== '')) {
-      formData.telefono = telefonoFormateado
-    }
+    // El teléfono se formatea en el evento on:input del input
 
     // Limitar dirección a 100 caracteres
     if (formData.direccion.length > 100) {
@@ -87,17 +55,20 @@
     }
   }
 
-  // Reactividad para búsqueda: filtrar clientes cuando cambie searchTerm
-  $: if (clientes.length > 0) searchTerm, filterClientes()
+  // Reactividad para filtrado: cuando searchTerm cambia desde el input, recalcular y volver a página 1
+  $: searchTerm && (() => {
+    console.log('[REACTIVIDAD SEARCH] searchTerm cambió a:', searchTerm, 'ejecutando filterClientes(true)')
+    filterClientes(true)
+  })()
 
   // Reactividad para paginación: recalcular cuando cambie filteredClientes o currentPage
   $: {
-    console.log('[REACTIVIDAD] paginación actualizada - filteredClientes:', filteredClientes.length, 'currentPage:', currentPage)
+    console.log('[REACTIVIDAD PAGINACION] Disparada - filteredClientes:', filteredClientes.length, 'currentPage:', currentPage, 'searchTerm:', searchTerm)
     const start = (currentPage - 1) * ITEMS_PER_PAGE
     const end = start + ITEMS_PER_PAGE
     paginatedClientes = [...filteredClientes.slice(start, end)]
     totalPages = Math.ceil(filteredClientes.length / ITEMS_PER_PAGE) || 1
-    console.log('[REACTIVIDAD] paginatedClientes:', paginatedClientes.length, 'totalPages:', totalPages)
+    console.log('[REACTIVIDAD PAGINACION] paginatedClientes:', paginatedClientes.length, 'totalPages:', totalPages)
   }
 
   const loadClientes = async () => {
@@ -110,22 +81,33 @@
       console.log('Usuario actual:', user)
       console.log('¿Es admin?', isAdmin)
       
-      // Para no sobrecargar el navegador, limitar a 500 clientes
       const data = await clienteService.getAll()
-      clientes = Array.isArray(data) ? data.filter(c => c.activo !== false).slice(0, 500) : []
-      clientes.sort((a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion))
+      console.log('[loadClientes] Data recibida:', data)
+      
+      // Cargar solo clientes activos
+      clientes = Array.isArray(data) ? data.filter(c => c.activo !== false && c.Activo !== false) : []
+      console.log('[loadClientes] Clientes activos después de filtrar:', clientes.length)
+      
+      // Ordenar por FechaCreacion descendente (más nuevo primero)
+      clientes.sort((a, b) => {
+        const fechaA = new Date(a.fechaCreacion || a.FechaCreacion || 0)
+        const fechaB = new Date(b.fechaCreacion || b.FechaCreacion || 0)
+        return fechaB - fechaA
+      })
+      
       // Resetear búsqueda y página
       searchTerm = ''
       currentPage = 1
-      filterClientes()
+      filterClientes(true)
     } catch (error) {
+      console.error('[loadClientes] Error:', error)
       await Swal.fire('Error', error.message, 'error')
     } finally {
       loading = false
     }
   }
 
-  const filterClientes = () => {
+  const filterClientes = (resetPage = true) => {
     console.log('[BUSQUEDA] searchTerm:', searchTerm)
     console.log('[BUSQUEDA] clientes disponibles:', clientes.length)
     const term = searchTerm.trim().toLowerCase()
@@ -166,7 +148,9 @@
       })
     }
     console.log('[BUSQUEDA] resultados filtrados:', filteredClientes.length)
-    currentPage = 1
+    if (resetPage) {
+      currentPage = 1
+    }
   }
 
   const goToPage = (page) => {
@@ -197,7 +181,7 @@
       if (!formData.cedula?.trim()) {
         errors.cedula = 'La cédula es requerida'
       } else if (!validators.isCedula(formData.cedula)) {
-        errors.cedula = 'La cédula debe tener 10 dígitos (formato: XX-XXX-XXX-X)'
+        errors.cedula = 'La cédula debe tener 10 dígitos (ej: 185104679-8)'
       }
     }
 
@@ -206,9 +190,9 @@
       errors.email = 'El email no es válido'
     }
 
-    // Validar teléfono (opcional, pero si se ingresa debe tener 7-10 dígitos)
-    if (formData.telefono?.trim() && !validators.isPhone(formData.telefono)) {
-      errors.telefono = 'El teléfono debe tener 7-10 dígitos'
+    // Validar teléfono (opcional, pero si se ingresa debe tener exactamente 10 dígitos)
+    if (formData.telefono?.trim() && formData.telefono.replace(/[^0-9]/g, '').length !== 10) {
+      errors.telefono = 'El teléfono debe tener exactamente 10 dígitos'
     }
 
     // Validar dirección (máximo 100 caracteres)
@@ -232,6 +216,46 @@
     showFormModal = true
   }
 
+  const filterClientesSilentMode = () => {
+    // Filtrar sin resetear página (modo silencioso)
+    console.log('[filterClientesSilentMode] Iniciando con searchTerm:', searchTerm, 'currentPage:', currentPage)
+    const term = searchTerm.trim().toLowerCase()
+    const termSinFormato = searchTerm.replace(/[^0-9]/g, '')
+    if (!term) {
+      filteredClientes = [...clientes]
+    } else {
+      const contieneArroba = term.includes('@')
+      const palabras = term.split(/\s+/).filter(Boolean)
+      filteredClientes = clientes.filter(c => {
+        const nombre = (c.nombre || '').toLowerCase()
+        const apellido = (c.apellido || '').toLowerCase()
+        const email = (c.email || '').toLowerCase()
+        const correo = (c.correo || '').toLowerCase()
+        const cedula = (c.cedula || '').replace(/[^0-9]/g, '')
+        const documento = (c.documento || '').replace(/[^0-9]/g, '')
+        const telefono = (c.telefono || '').replace(/[^0-9]/g, '')
+        const buscaNumeros = !!termSinFormato
+        if (buscaNumeros && (
+          cedula.includes(termSinFormato) ||
+          documento.includes(termSinFormato) ||
+          telefono.includes(termSinFormato)
+        )) {
+          return true
+        }
+        if (contieneArroba) {
+          return email.includes(term) || correo.includes(term)
+        }
+        return palabras.every(palabra =>
+          nombre.includes(palabra) ||
+          apellido.includes(palabra) ||
+          email.includes(palabra) ||
+          correo.includes(palabra)
+        )
+      })
+    }
+    console.log('[filterClientesSilentMode] Resultados filtrados:', filteredClientes.length, 'currentPage después:', currentPage)
+  }
+
   const handleDelete = async (cliente) => {
     const result = await Swal.fire({
       title: '¿Eliminar cliente?',
@@ -246,10 +270,25 @@
 
     if (result.isConfirmed) {
       try {
+        const paginaActual = currentPage
+        console.log('[handleDelete] Página actual antes de eliminar:', paginaActual)
         await clienteService.delete(cliente.id)
+        clientes = clientes.filter(c => c.id !== cliente.id)
+        filterClientesSilentMode() // Recalcular sin ir a página 1
+        console.log('[handleDelete] filteredClientes después de eliminar:', filteredClientes.length)
+        // Calcular cuántas páginas hay después de la eliminación
+        const totalPaginasAhora = Math.ceil(filteredClientes.length / ITEMS_PER_PAGE) || 1
+        console.log('[handleDelete] Total páginas ahora:', totalPaginasAhora, 'página actual:', paginaActual)
+        // Si la página actual es > total de páginas, ir a la última página
+        if (paginaActual > totalPaginasAhora) {
+          currentPage = totalPaginasAhora
+          console.log('[handleDelete] Página ajustada a:', totalPaginasAhora)
+        } else {
+          currentPage = paginaActual
+          console.log('[handleDelete] Mantener página:', paginaActual)
+        }
         successMessage = 'Cliente eliminado correctamente'
         setTimeout(() => { successMessage = '' }, 3000)
-        await loadClientes()
       } catch (error) {
         await Swal.fire('Error', error.message, 'error')
       }
@@ -274,18 +313,50 @@
       }
 
       if (editingClienteId) {
+        // Actualización: actualizar en la lista sin recargarse, mantener página actual
+        console.log('[handleSubmit] Editando cliente:', editingClienteId, 'página actual:', currentPage)
         await clienteService.update(editingClienteId, dataToSend)
+        const index = clientes.findIndex(c => c.id === editingClienteId)
+        if (index !== -1) {
+          clientes[index] = { ...clientes[index], ...dataToSend }
+          clientes = clientes // Trigger reactivity
+          const paginaAntes = currentPage
+          filterClientesSilentMode() // Recalcular filtrado sin ir a página 1
+          // Asegurar que la página se mantiene igual
+          currentPage = paginaAntes
+          console.log('[handleSubmit] Página después de editar:', currentPage)
+        }
         successMessage = 'Cliente actualizado correctamente'
       } else {
-        await clienteService.create(dataToSend)
-        successMessage = 'Cliente creado correctamente'
+        // Creación: agregar a la lista sin recargarse, ir a página 1
+        const response = await clienteService.create(dataToSend)
+        console.log('[handleSubmit] Response de creación:', response)
+        
+        const clienteId = response?.id || response?.Id
+        if (clienteId) {
+          // Usar la respuesta del servidor con el ID asignado
+          const nuevoCliente = {
+            ...response,
+            id: response?.id || response?.Id,
+            documento: response?.documento || response?.Documento,
+            correo: response?.email || response?.Email || response?.correo || response?.Correo
+          }
+          clientes = [nuevoCliente, ...clientes] // Esto actualizará filteredClientes en el bloque reactivo
+          // Limpiar búsqueda y mostrar en página 1
+          searchTerm = ''
+          currentPage = 1
+          filterClientes(true) // Asegurar que filteredClientes se actualiza con el nuevo cliente
+          successMessage = 'Cliente creado correctamente'
+        } else {
+          throw new Error('No se pudo obtener el ID del cliente creado. Response: ' + JSON.stringify(response))
+        }
       }
       
       setTimeout(() => { successMessage = '' }, 3000)
       showFormModal = false
       resetForm()
-      await loadClientes()
     } catch (error) {
+      console.error('[handleSubmit] Error:', error)
       await Swal.fire('Error', error.message, 'error')
     }
   }
@@ -348,7 +419,6 @@
         type="text"
         placeholder="Buscar por nombre, documento, teléfono o correo..."
         bind:value={searchTerm}
-        on:input={() => filterClientes()}
       />
     </div>
 
@@ -387,7 +457,7 @@
                   </td>
                   <td>{formatters.formatCedula(cliente.cedula || cliente.documento || '')}</td>
                   <td>{cliente.email || cliente.correo || '-'}</td>
-                  <td>{formatters.formatPhone(cliente.telefono || '-')}</td>
+                  <td>{cliente.telefono || '-'}</td>
                   <td>
                     <span class="badge badge-success">
                       {cliente.activo ? 'Activo' : 'Inactivo'}
@@ -518,7 +588,7 @@
             />
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;">
+          <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-bottom: 1rem;">
             <div>
               <label for="cedula" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #0F172A;">
                 Cédula/Documento
@@ -529,17 +599,26 @@
               <input
                 id="cedula"
                 type="text"
+                inputmode="numeric"
                 value={formData.cedula}
-                on:input={(e) => { formData.cedula = e.target.value }}
-                placeholder="17-056-789-01 (formato: XX-XXX-XXX-X)"
+                on:input={(e) => { 
+                  let numeros = e.target.value.replace(/[^0-9]/g, '').substring(0, 10)
+                  formData.cedula = numeros.length < 10 ? numeros : numeros.substring(0, 9) + '-' + numeros.substring(9, 10)
+                }}
+                on:keypress={(e) => {
+                  if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Enter') {
+                    e.preventDefault()
+                  }
+                }}
+                placeholder="185104679-8 (10 dígitos)"
                 disabled={editingClienteId ? true : false}
-                maxlength={13}
+                maxlength={11}
                 style="width: 100%; padding: 0.625rem; border: 1px solid {errors.cedula ? '#ef4444' : '#E2E8F0'}; border-radius: 0.375rem; box-sizing: border-box;"
               />
               {#if errors.cedula}
                 <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{errors.cedula}</div>
               {:else if !editingClienteId}
-                <div style="color: #64748B; font-size: 0.75rem; margin-top: 0.25rem;">10 dígitos, máscara automática XX-XXX-XXX-X</div>
+                <div style="color: #64748B; font-size: 0.75rem; margin-top: 0.25rem;">Únicamente 10 dígitos - Formato automático XXXXXXXXX-X</div>
               {/if}
             </div>
           </div>
@@ -556,15 +635,34 @@
           </div>
 
           <div class="form-row">
-            <FormInput
-              label="Teléfono"
-              name="telefono"
-              bind:value={formData.telefono}
-              placeholder="09-8765-4321 (formato: 09-XXXX-XXXX)"
-              error={errors.telefono}
-              maxlength={12}
-            />
-            <div class="help-text">7-10 dígitos, máscara automática 09-XXXX-XXXX</div>
+            <div>
+              <label for="telefono" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #0F172A;">
+                Teléfono
+              </label>
+              <input
+                id="telefono"
+                type="text"
+                inputmode="numeric"
+                value={formData.telefono}
+                on:input={(e) => { 
+                  let numeros = e.target.value.replace(/[^0-9]/g, '').substring(0, 10)
+                  formData.telefono = numeros
+                }}
+                on:keypress={(e) => {
+                  if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Enter') {
+                    e.preventDefault()
+                  }
+                }}
+                placeholder="0963018765"
+                maxlength={10}
+                style="width: 100%; padding: 0.625rem; border: 1px solid {errors.telefono ? '#ef4444' : '#E2E8F0'}; border-radius: 0.375rem; box-sizing: border-box;"
+              />
+              {#if errors.telefono}
+                <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{errors.telefono}</div>
+              {:else}
+                <div style="color: #64748B; font-size: 0.75rem; margin-top: 0.25rem;">Unicamente 10 dígitos</div>
+              {/if}
+            </div>
           </div>
 
           <div class="form-row full-width">

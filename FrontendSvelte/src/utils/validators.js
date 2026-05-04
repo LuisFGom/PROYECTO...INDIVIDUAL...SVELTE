@@ -7,7 +7,7 @@ export const validators = {
   },
 
   isCedula(cedula) {
-    // Formato: XX-XXX-XXX-X (10 dígitos totales)
+    // Formato: XXXXXXXXXX-X (10 dígitos totales)
     const numeros = cedula.replace(/[^0-9]/g, '')
     return numeros.length === 10
   },
@@ -55,14 +55,12 @@ export const validators = {
 // Formateadores
 export const formatters = {
   formatCedula(cedula) {
-    // Formato: XX-XXX-XXX-X (10 dígitos)
+    // Formato: XXXXXXXXXX-X (10 dígitos + guión al final)
     if (!cedula) return ''
     const numeros = cedula.replace(/[^0-9]/g, '').substring(0, 10)
     if (numeros.length === 0) return ''
-    if (numeros.length <= 2) return numeros
-    if (numeros.length <= 5) return numeros.substring(0, 2) + '-' + numeros.substring(2)
-    if (numeros.length <= 8) return numeros.substring(0, 2) + '-' + numeros.substring(2, 5) + '-' + numeros.substring(5)
-    return numeros.substring(0, 2) + '-' + numeros.substring(2, 5) + '-' + numeros.substring(5, 8) + '-' + numeros.substring(8, 10)
+    if (numeros.length < 10) return numeros
+    return numeros.substring(0, 9) + '-' + numeros.substring(9, 10)
   },
 
   formatPhone(phone) {
