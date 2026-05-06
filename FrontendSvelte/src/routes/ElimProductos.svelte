@@ -39,7 +39,7 @@
       precioCosto: p.precioCompra ?? 0,
       precioVenta: p.precio ?? 0,
       stock: p.stock ?? 0,
-      eliminadoPor: aud?.nombreUsuario || '-',
+      eliminadoPor: p.nombreAdministrador || aud?.nombreUsuario || '-',
       tipoEliminacion: 'Desactivación',
       fechaEliminacion: aud?.fechaAccion || p.fechaEliminacion || null
     }
@@ -126,7 +126,7 @@
 
 <div class="elimproductos-page">
   <div class="page-header">
-    <h1><i class="fas fa-trash-restore"></i> Historial de Eliminaciones de Productos</h1>
+    <h1><i class="fas fa-trash-restore"></i> Historial de Desactivaciones de Productos</h1>
   </div>
 
   {#if successMessage}
@@ -165,8 +165,8 @@
                 <th>FECHA</th>
                 <th>CÓDIGO</th>
                 <th>PRODUCTO</th>
-                <th>P. COSTO</th>
-                <th>P. VENTA</th>
+                <th>COSTO</th>
+                <th>VENTA</th>
                 <th>STOCK</th>
                 <th>ELIMINADO POR</th>
                 <th>TIPO</th>

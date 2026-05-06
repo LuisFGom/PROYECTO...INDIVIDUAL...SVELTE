@@ -68,6 +68,7 @@ namespace PuntoVenta.Application.DTOs
         public decimal TotalVenta { get; set; }
         public string? Estado { get; set; }
         public string? Observaciones { get; set; }
+        public string? EliminadoPor { get; set; }
     }
 
     /// <summary>
@@ -89,5 +90,6 @@ namespace PuntoVenta.Application.DTOs
         public string? Estado { get; set; }
         public string? Observaciones { get; set; }
         public List<DetalleVentaResponseDto>? Detalles { get; set; }
+        public string? EliminadoPor { get; set; }
     }
 }

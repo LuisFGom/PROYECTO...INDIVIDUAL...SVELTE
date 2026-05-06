@@ -23,6 +23,7 @@ namespace PuntoVenta.Application.Features.Ventas.Queries
             try
             {
                 var facturas = await _unitOfWork.Facturas.GetAllAsync();
+                var auditorias = await _unitOfWork.AuditoriasAcciones.GetAllAsync();
 
                 // Filtrar solo las eliminadas
                 var query = facturas.Where(f => f.Estado == "Eliminada").AsEnumerable();
@@ -64,7 +65,13 @@ namespace PuntoVenta.Application.Features.Ventas.Queries
                         TotalImpuesto = f.TotalImpuesto,
                         TotalVenta = f.TotalVenta,
                         Estado = f.Estado,
-                        Observaciones = f.Observaciones
+                        Observaciones = f.Observaciones,
+                        EliminadoPor = auditorias
+                            .Where(a => a.RegistroAfectadoId == f.Id && 
+                                      a.Modulo == "Ventas" && 
+                                      a.TipoAccion == "Eliminar")
+                            .OrderByDescending(a => a.FechaAccion)
+                            .FirstOrDefault()?.NombreUsuario
                     })
                     .ToList();
 

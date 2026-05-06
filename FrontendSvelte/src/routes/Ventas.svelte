@@ -401,21 +401,21 @@
 
   const eliminarFactura = async (venta) => {
     const result = await Swal.fire({
-      title: '¿Eliminar Factura?',
-      text: `¿Seguro que deseas eliminar la factura ${venta.numeroFactura}?`,
+      title: '¿Anular Factura?',
+      text: `¿Seguro que deseas anular la factura ${venta.numeroFactura}?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
+      confirmButtonText: 'Sí, anular',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#d32f2f'
     })
 
     if (result.isConfirmed) {
       try {
-        // ✅ LLAMAR AL BACKEND PARA ELIMINAR (soft delete)
-        await ventaService.delete(venta.id)
+        // ✅ LLAMAR AL BACKEND PARA ANULAR (soft delete) Y RESTAURAR STOCK
+        await ventaService.anularVenta(venta.id)
         
-        Swal.fire('Éxito', 'Factura eliminada correctamente', 'success')
+        Swal.fire('Éxito', 'Factura anulada correctamente', 'success')
         await loadVentas()
       } catch (error) {
         console.error('Error eliminando factura:', error)
@@ -545,8 +545,8 @@
                       <button class="btn-action btn-action-ver" on:click={() => abrirDetalles(venta)} title="Ver resumen">
                         <i class="fas fa-file-alt"></i> Resumen
                       </button>
-                      <button class="btn-action btn-action-eliminar" on:click={() => eliminarFactura(venta)} title="Eliminar" disabled={!isAdmin}>
-                        <i class="fas fa-trash"></i> Eliminar
+                      <button class="btn-action btn-action-eliminar" on:click={() => eliminarFactura(venta)} title="Anular" disabled={!isAdmin}>
+                        <i class="fas fa-ban"></i> Anular
                       </button>
                       <button class="btn-action btn-action-pdf" on:click={() => abrirPdfModal(venta)} title="Descargar PDF">
                         <i class="fas fa-file-pdf"></i> PDF

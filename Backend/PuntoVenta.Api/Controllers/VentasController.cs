@@ -82,6 +82,9 @@ namespace PuntoVenta.Api.Controllers
                     query = query.Where(v => v.Estado == estado);
                 }
 
+                // Filtrar para excluir facturas eliminadas o anuladas
+                query = query.Where(v => v.Estado != "Eliminada" && v.Estado != "Anulada");
+
                 // Mapear a DTO - Usar hash code del ObjectId como int temporal para compatibilidad
                 var result = query.Select(f => new VentaResponseDto
                 {
@@ -324,7 +327,7 @@ namespace PuntoVenta.Api.Controllers
         /// Marca una factura como eliminada (soft delete) y restaura stock
         /// </summary>
         [HttpPut("{id}/eliminar")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<bool>> DeleteVentaSoft(int id)
         {
             try

@@ -189,20 +189,20 @@
 
   const handleDelete = async (usuario) => {
     const result = await Swal.fire({
-      title: '¿Eliminar usuario?',
-      text: `Se eliminará el usuario "${usuario.nombreUsuario}". Esta acción no se puede deshacer.`,
+      title: '¿Desactivar usuario?',
+      text: `Se desactivará el usuario "${usuario.nombreUsuario}". Esta acción no se puede deshacer.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Sí, eliminar',
+      confirmButtonText: 'Sí, desactivar',
       cancelButtonText: 'Cancelar'
     })
 
     if (result.isConfirmed) {
       try {
         await usuarioService.delete(usuario.id)
-        successMessage = 'Usuario eliminado correctamente'
+        successMessage = 'Usuario desactivado correctamente'
         setTimeout(() => { successMessage = '' }, 3000)
         await loadUsuarios()
       } catch (error) {
@@ -364,9 +364,9 @@
                         <button
                           class="btn btn-sm btn-danger"
                           on:click={() => handleDelete(usuario)}
-                          title="Eliminar"
+                          title="Desactivar"
                         >
-                          <i class="fas fa-trash"></i> Eliminar
+                          <i class="fas fa-ban"></i> Desactivar
                         </button>
                       {:else}
                         <span style="color: #6b7280; font-size: 0.75rem;">-</span>

@@ -38,6 +38,11 @@ const ventaService = {
     return httpClient.delete(`/ventas/${id}`)
   },
 
+  // Anular una factura (soft delete) - restaura stock
+  anularVenta(id) {
+    return httpClient.put(`/ventas/${id}/eliminar`)
+  },
+
   async downloadPdf(id, nombreArchivo = null) {
     try {
       const response = await fetch(`http://localhost:5000/api/ventas/${id}/pdf`, {

@@ -32,9 +32,9 @@
     return {
       id: eliminado.id,
       usuarioEliminadoId: eliminado.usuarioEliminadoId,
-      nombreUsuario: eliminado.nombreUsuarioEliminado || eliminado.nombreUsuario || 'N/A',
-      nombre: eliminado.nombreUsuarioEliminado || '',
-      apellido: '',
+      nombreUsuario: eliminado.nombreUsuario || eliminado.nombreUsuarioEliminado || 'N/A',
+      nombre: eliminado.nombre || eliminado.nombreUsuarioEliminado || '',
+      apellido: eliminado.apellido || '',
       email: eliminado.emailUsuarioEliminado || eliminado.email || '-',
       rolNombre: eliminado.rolUsuarioEliminado || eliminado.rolNombre || 'N/A',
       rol: eliminado.rolUsuarioEliminado || eliminado.rol || 'N/A',
@@ -50,6 +50,17 @@
       let data = await usuarioService.getEliminados()
       data = Array.isArray(data) ? data : []
       usuariosEliminados = data.map(normalizeEliminado)
+      
+      // Deduplicar por usuarioEliminadoId, mantener el primero (más reciente)
+      const seenIds = new Set()
+      usuariosEliminados = usuariosEliminados.filter(usuario => {
+        if (seenIds.has(usuario.usuarioEliminadoId)) {
+          return false
+        }
+        seenIds.add(usuario.usuarioEliminadoId)
+        return true
+      })
+      
       usuariosEliminados.sort((a, b) => new Date(b.fechaEliminacion) - new Date(a.fechaEliminacion))
       searchTerm = ''
       currentPage = 1
@@ -111,7 +122,7 @@
 
 <div class="elimusuarios-page">
   <div class="page-header">
-    <h1><i class="fas fa-trash-restore"></i> Historial de Eliminaciones de Usuarios</h1>
+    <h1><i class="fas fa-trash-restore"></i> Historial de Desactivaciones de Usuarios</h1>
   </div>
 
   {#if successMessage}
@@ -147,7 +158,7 @@
           <table class="table">
             <thead>
               <tr>
-                <th>FECHA ELIMINACIÓN</th>
+                <th>FECHA</th>
                 <th>NOMBRE USUARIO</th>
                 <th>EMAIL</th>
                 <th>ROL</th>
@@ -159,7 +170,7 @@
             <tbody>
               {#each paginatedUsuarios as usuario (usuario.id)}
                 <tr>
-                  <td>{formatters.formatDate(usuario.fechaEliminacion)}</td>
+                  <td>{usuario.fechaEliminacion ? new Date(usuario.fechaEliminacion).toLocaleString('es-EC') : '-'}</td>
                   <td>
                     <strong>{usuario.nombreUsuario}</strong>
                     <div style="font-size: 0.75rem; color: #6b7280;">{usuario.nombre} {usuario.apellido}</div>

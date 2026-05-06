@@ -40,7 +40,7 @@
       documento: c.documento || '-',
       email: c.email || '-',
       telefono: c.telefono || '-',
-      eliminadoPor: aud?.nombreUsuario || '-',
+      eliminadoPor: c.nombreAdministrador || aud?.nombreUsuario || '-',
       tipoEliminacion: 'Desactivación',
       fechaEliminacion: aud?.fechaAccion || c.fechaEliminacion || null
     }
@@ -127,7 +127,7 @@
 
 <div class="elimclientes-page">
   <div class="page-header">
-    <h1><i class="fas fa-trash-restore"></i> Historial de Eliminaciones de Clientes</h1>
+    <h1><i class="fas fa-trash-restore"></i> Historial de Desactivaciones de Clientes</h1>
   </div>
 
   {#if successMessage}
@@ -163,7 +163,7 @@
           <table class="table">
             <thead>
               <tr>
-                <th>FECHA ELIMINACIÓN</th>
+                <th>FECHA</th>
                 <th>NOMBRE CLIENTE</th>
                 <th>DOCUMENTO</th>
                 <th>EMAIL</th>
@@ -176,7 +176,7 @@
             <tbody>
               {#each paginatedClientes as cliente (cliente.id)}
                 <tr>
-                  <td>{formatters.formatDate(cliente.fechaEliminacion)}</td>
+                  <td>{cliente.fechaEliminacion ? new Date(cliente.fechaEliminacion).toLocaleString('es-EC') : '-'}</td>
                   <td>
                     <strong>{cliente.nombre}</strong>
                   </td>

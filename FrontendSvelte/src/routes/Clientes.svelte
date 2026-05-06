@@ -258,13 +258,13 @@
 
   const handleDelete = async (cliente) => {
     const result = await Swal.fire({
-      title: '¿Eliminar cliente?',
-      text: 'Esta acción no se puede deshacer.',
+      title: '¿Desactivar cliente?',
+      text: `Se desactivará el cliente ${cliente.nombre}.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Sí, eliminar',
+      confirmButtonText: 'Sí, desactivar',
       cancelButtonText: 'Cancelar'
     })
 
@@ -287,7 +287,7 @@
           currentPage = paginaActual
           console.log('[handleDelete] Mantener página:', paginaActual)
         }
-        successMessage = 'Cliente eliminado correctamente'
+        successMessage = 'Cliente desactivado correctamente'
         setTimeout(() => { successMessage = '' }, 3000)
       } catch (error) {
         await Swal.fire('Error', error.message, 'error')
@@ -479,9 +479,9 @@
                         <button
                           class="btn btn-sm btn-danger"
                           on:click={() => handleDelete(cliente)}
-                          title="Eliminar"
+                          title="Desactivar"
                         >
-                          <i class="fas fa-trash"></i> Eliminar
+                          <i class="fas fa-ban"></i> Desactivar
                         </button>
                       {:else}
                         <span style="color: #6b7280; font-size: 0.75rem;">-</span>

@@ -215,11 +215,14 @@
 
   const handleDelete = async (producto) => {
     const result = await Swal.fire({
-      title: '¿Eliminar producto?',
-      text: `Se eliminará ${producto.nombre}`,
+      title: '¿Desactivar producto?',
+      text: `Se desactivará ${producto.nombre}`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar'
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sí, desactivar',
+      cancelButtonText: 'Cancelar'
     })
 
     if (result.isConfirmed) {
@@ -237,7 +240,7 @@
         } else {
           currentPage = paginaActual
         }
-        successMessage = 'Producto eliminado correctamente'
+        successMessage = 'Producto desactivado correctamente'
         setTimeout(() => { successMessage = '' }, 3000)
       } catch (error) {
         await Swal.fire('Error', error.message, 'error')
@@ -489,9 +492,9 @@
                         <button
                           class="btn btn-sm btn-danger"
                           on:click={() => handleDelete(producto)}
-                          title="Eliminar"
+                          title="Desactivar"
                         >
-                          <i class="fas fa-trash"></i> Eliminar
+                          <i class="fas fa-ban"></i> Desactivar
                         </button>
                       </div>
                     </td>

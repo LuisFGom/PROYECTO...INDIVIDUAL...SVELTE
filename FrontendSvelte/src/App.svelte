@@ -13,6 +13,7 @@
   import ElimUsuarios from './routes/ElimUsuarios.svelte'
   import ElimClientes from './routes/ElimClientes.svelte'
   import ElimProductos from './routes/ElimProductos.svelte'
+  import ElimVentas from './routes/ElimVentas.svelte'
 
   import Logs from './routes/Logs.svelte'
 
@@ -147,7 +148,7 @@
               class="menu-item {currentPage === 'elim-usuarios' ? 'active' : ''}"
             >
               <i class="fas fa-user-slash"></i>
-              <span>Elim. Usuarios</span>
+              <span>Usuarios Desactivados</span>
             </button>
           </li>
 
@@ -157,7 +158,7 @@
               class="menu-item {currentPage === 'elim-clientes' ? 'active' : ''}"
             >
               <i class="fas fa-user-slash"></i>
-              <span>Elim. Clientes</span>
+              <span>Clientes Desactivados</span>
             </button>
           </li>
 
@@ -167,7 +168,17 @@
               class="menu-item {currentPage === 'elim-productos' ? 'active' : ''}"
             >
               <i class="fas fa-box"></i>
-              <span>Elim. Productos</span>
+              <span>Productos Desactivados</span>
+            </button>
+          </li>
+
+          <li>
+            <button
+              on:click={() => handleNavigate('elim-ventas')}
+              class="menu-item {currentPage === 'elim-ventas' ? 'active' : ''}"
+            >
+              <i class="fas fa-file-invoice"></i>
+              <span>Facturas Anuladas</span>
             </button>
           </li>
 
@@ -221,6 +232,8 @@
             <ElimClientes />
           {:else if currentPage === 'elim-productos'}
             <ElimProductos />
+          {:else if currentPage === 'elim-ventas'}
+            <ElimVentas />
 
           {:else if currentPage === 'logs'}
             <Logs />
