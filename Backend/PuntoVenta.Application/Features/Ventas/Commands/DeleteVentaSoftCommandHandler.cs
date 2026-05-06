@@ -24,14 +24,16 @@ namespace PuntoVenta.Application.Features.Ventas.Commands
             {
                 var factura = await _unitOfWork.Facturas.GetFacturaConDetallesAsync(request.VentaId);
 
+                // ✅ VALIDAR QUE LA FACTURA EXISTE
                 if (factura == null)
                 {
-                    throw new Exception($"Factura con ID {request.VentaId} no encontrada");
+                    throw new Exception($"ERROR: La factura no existe o fue eliminada");
                 }
 
+                // ✅ VALIDAR QUE NO ESTÉ YA ELIMINADA
                 if (factura.Estado == "Eliminada")
                 {
-                    throw new Exception("Esta factura ya está marcada como eliminada");
+                    throw new Exception($"ERROR: Esta factura ya está marcada como eliminada");
                 }
 
                 // Marcar factura como eliminada (soft delete)
@@ -75,7 +77,7 @@ namespace PuntoVenta.Application.Features.Ventas.Commands
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al eliminar factura: {ex.Message}");
+                throw new Exception($"{ex.Message}");
             }
         }
     }

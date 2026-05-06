@@ -327,7 +327,29 @@
       await loadVentas()
     } catch (error) {
       console.error('Error creando factura:', error)
-      Swal.fire('Error', error.message || 'Error al crear factura', 'error')
+      
+      // ✅ MOSTRAR ERROR SIN CERRAR LA VENTANA - PERMITIR HACER CAMBIOS
+      // El usuario permanece en la pantalla de factura para corregir
+      Swal.fire({
+        icon: 'error',
+        title: 'No se pudo guardar la factura',
+        html: `
+          <div style="text-align: left; color: #d32f2f; font-weight: 600; padding: 1rem; background: #ffebee; border-radius: 4px;">
+            ${error.message || 'Error desconocido al crear factura'}
+          </div>
+          <p style="margin-top: 1rem; color: #666;">
+            Por favor verifica:
+          </p>
+          <ul style="text-align: left; color: #666;">
+            <li>El cliente no haya sido eliminado</li>
+            <li>Los productos sigan disponibles</li>
+            <li>El stock sea suficiente</li>
+          </ul>
+        `,
+        confirmButtonText: 'Entendido, permanecer editando',
+        confirmButtonColor: '#3B82F6',
+        allowOutsideClick: false
+      })
     }
   }
 
@@ -380,20 +402,36 @@
   const eliminarFactura = async (venta) => {
     const result = await Swal.fire({
       title: '¿Eliminar Factura?',
-      text: `¿Seguro que deseas eliminar la factura ${venta.id}?`,
+      text: `¿Seguro que deseas eliminar la factura ${venta.numeroFactura}?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d32f2f'
     })
 
     if (result.isConfirmed) {
       try {
-        // Aquí iría la llamada al backend para eliminar
+        // ✅ LLAMAR AL BACKEND PARA ELIMINAR (soft delete)
+        await ventaService.delete(venta.id)
+        
         Swal.fire('Éxito', 'Factura eliminada correctamente', 'success')
         await loadVentas()
       } catch (error) {
         console.error('Error eliminando factura:', error)
+        
+        // ✅ MOSTRAR ERROR ESPECÍFICO
+        Swal.fire({
+          icon: 'error',
+          title: 'No se pudo eliminar la factura',
+          html: `
+            <div style="text-align: left; color: #d32f2f; font-weight: 600; padding: 1rem; background: #ffebee; border-radius: 4px;">
+              ${error.message || 'Error desconocido'}
+            </div>
+          `,
+          confirmButtonText: 'Entendido',
+          confirmButtonColor: '#d32f2f'
+        })
       }
     }
   }

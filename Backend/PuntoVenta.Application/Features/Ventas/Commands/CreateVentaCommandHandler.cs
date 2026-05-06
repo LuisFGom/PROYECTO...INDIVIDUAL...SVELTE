@@ -31,21 +31,22 @@ namespace PuntoVenta.Application.Features.Ventas.Commands
                 throw new Exception("La factura debe tener al menos un producto");
             }
 
-            // Validar que los productos existen y tienen stock
-            decimal subtotal = 0;
-            var detallesVenta = new List<DetalleVenta>();
-
-            // Get cliente info if provided
+            // ✅ VALIDAR CLIENTE SI VIENE ESPECIFICADO
             string clienteNombre = string.Empty;
             string clienteDocumento = string.Empty;
-            if (request.ClienteId.HasValue)
+            if (request.ClienteId.HasValue && request.ClienteId.Value > 0)
             {
                 var cliente = await _unitOfWork.Clientes.GetByIdAsync(request.ClienteId.Value);
-                if (cliente != null)
+                if (cliente == null)
                 {
-                    clienteNombre = cliente.Nombre;
-                    clienteDocumento = cliente.Documento;
+                    throw new Exception("ERROR: El cliente seleccionado no existe o fue eliminado");
                 }
+                if (!cliente.Activo)
+                {
+                    throw new Exception("ERROR: El cliente seleccionado está inactivo");
+                }
+                clienteNombre = cliente.Nombre;
+                clienteDocumento = cliente.Documento;
             }
 
             // Get usuario info
@@ -56,17 +57,30 @@ namespace PuntoVenta.Application.Features.Ventas.Commands
                 usuarioNombre = usuario.Nombre;
             }
 
+            // ✅ VALIDAR PRODUCTOS Y STOCK ANTES DE HACER NADA
+            decimal subtotal = 0;
+            var detallesVenta = new List<DetalleVenta>();
+
             foreach (var detalle in request.Detalles)
             {
                 var producto = await _unitOfWork.Productos.GetByIdAsync(detalle.ProductoId);
+                
+                // Validar que el producto existe
                 if (producto == null)
                 {
-                    throw new Exception($"El producto con ID {detalle.ProductoId} no existe");
+                    throw new Exception($"ERROR: El producto no existe o fue eliminado");
                 }
 
+                // Validar que el producto está activo
+                if (!producto.Activo)
+                {
+                    throw new Exception($"ERROR: El producto '{producto.Nombre}' no está disponible");
+                }
+
+                // Validar stock suficiente
                 if (producto.Stock < detalle.Cantidad)
                 {
-                    throw new Exception($"Stock insuficiente para {producto.Nombre}. Disponible: {producto.Stock}, Solicitado: {detalle.Cantidad}");
+                    throw new Exception($"ERROR: Stock insuficiente para '{producto.Nombre}'. Disponible: {producto.Stock}, Solicitado: {detalle.Cantidad}");
                 }
 
                 // Calcular total del detalle
@@ -128,14 +142,17 @@ namespace PuntoVenta.Application.Features.Ventas.Commands
                     {
                         try
                         {
-                            await _emailService.SendVentaCreatedEmailAsync(
-                                cliente.Email,
-                                cliente.Nombre,
-                                factura.NumeroFactura,
-                                factura.TotalVenta,
-                                factura.UsuarioNombre
-                            );
-                            _logger.LogInformation($"✅ Email de venta enviado a {cliente.Email} - Factura: {factura.NumeroFactura}");
+                            // COMENTADO: El correo se envía en el controlador (VentasController.cs línea 238)
+                            // con versión mejorada que incluye detalles de los productos.
+                            // Este handler SOLO se usa como backup. Desactivamos para evitar duplicados.
+                            //await _emailService.SendVentaCreatedEmailAsync(
+                            //    cliente.Email,
+                            //    cliente.Nombre,
+                            //    factura.NumeroFactura,
+                            //    factura.TotalVenta,
+                            //    factura.UsuarioNombre
+                            //);
+                            _logger.LogInformation($"✅ Email de venta será enviado desde VentasController - Factura: {factura.NumeroFactura}");
                         }
                         catch (Exception emailEx)
                         {

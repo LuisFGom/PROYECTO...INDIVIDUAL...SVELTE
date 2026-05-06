@@ -245,19 +245,20 @@ namespace PuntoVenta.Api.Controllers
                 };
 
                 // Enviar email de bienvenida si el cliente tiene email
-                if (!string.IsNullOrWhiteSpace(cliente.Email))
-                {
-                    try
-                    {
-                        string clienteCompleto = $"{cliente.Nombre} {cliente.Apellido}".Trim();
-                        await _emailService.SendClienteCreatedEmailAsync(cliente.Email, clienteCompleto, cliente.Documento);
-                        _logger.LogInformation($"✅ Email de bienvenida enviado a {cliente.Email}");
-                    }
-                    catch (Exception emailEx)
-                    {
-                        _logger.LogWarning($"⚠️ No se pudo enviar email de bienvenida a {cliente.Email}: {emailEx.Message}");
-                    }
-                }
+                // COMENTADO: Solo queremos correos al crear/eliminar facturas
+                //if (!string.IsNullOrWhiteSpace(cliente.Email))
+                //{
+                //    try
+                //    {
+                //        string clienteCompleto = $"{cliente.Nombre} {cliente.Apellido}".Trim();
+                //        await _emailService.SendClienteCreatedEmailAsync(cliente.Email, clienteCompleto, cliente.Documento);
+                //        _logger.LogInformation($"✅ Email de bienvenida enviado a {cliente.Email}");
+                //    }
+                //    catch (Exception emailEx)
+                //    {
+                //        _logger.LogWarning($"⚠️ No se pudo enviar email de bienvenida a {cliente.Email}: {emailEx.Message}");
+                //    }
+                //}
 
                 return CreatedAtAction(nameof(GetClienteById), new { id = cliente.Id }, result);
             }
@@ -373,20 +374,21 @@ namespace PuntoVenta.Api.Controllers
                     camposModificados.Add($"<li>Estado: {(clienteOriginal.Activo ? "Activo" : "Inactivo")} → {(cliente.Activo ? "Activo" : "Inactivo")}</li>");
 
                 // Enviar email solo si hay cambios
-                if (camposModificados.Count > 0 && !string.IsNullOrWhiteSpace(cliente.Email))
-                {
-                    try
-                    {
-                        string clienteCompleto = $"{cliente.Nombre} {cliente.Apellido}".Trim();
-                        string camposHTML = string.Join("\n", camposModificados);
-                        await _emailService.SendClienteUpdatedEmailAsync(cliente.Email, clienteCompleto, camposHTML);
-                        _logger.LogInformation($"✅ Email de actualización enviado a {cliente.Email}");
-                    }
-                    catch (Exception emailEx)
-                    {
-                        _logger.LogWarning($"⚠️ No se pudo enviar email de actualización a {cliente.Email}: {emailEx.Message}");
-                    }
-                }
+                // COMENTADO: Solo queremos correos al crear/eliminar facturas
+                //if (camposModificados.Count > 0 && !string.IsNullOrWhiteSpace(cliente.Email))
+                //{
+                //    try
+                //    {
+                //        string clienteCompleto = $"{cliente.Nombre} {cliente.Apellido}".Trim();
+                //        string camposHTML = string.Join("\n", camposModificados);
+                //        await _emailService.SendClienteUpdatedEmailAsync(cliente.Email, clienteCompleto, camposHTML);
+                //        _logger.LogInformation($"✅ Email de actualización enviado a {cliente.Email}");
+                //    }
+                //    catch (Exception emailEx)
+                //    {
+                //        _logger.LogWarning($"⚠️ No se pudo enviar email de actualización a {cliente.Email}: {emailEx.Message}");
+                //    }
+                //}
 
                 var result = new ClienteResponseDto
                 {
@@ -554,19 +556,20 @@ namespace PuntoVenta.Api.Controllers
                 }
 
                 // Enviar email de notificación de desactivación
-                if (!string.IsNullOrWhiteSpace(cliente.Email))
-                {
-                    try
-                    {
-                        string clienteCompleto = $"{cliente.Nombre} {cliente.Apellido}".Trim();
-                        await _emailService.SendClienteDeletedEmailAsync(cliente.Email, clienteCompleto, cliente.Documento);
-                        _logger.LogInformation($"✅ Email de desactivación enviado a {cliente.Email}");
-                    }
-                    catch (Exception emailEx)
-                    {
-                        _logger.LogWarning($"⚠️ No se pudo enviar email de desactivación a {cliente.Email}: {emailEx.Message}");
-                    }
-                }
+                // COMENTADO: Solo queremos correos al crear/eliminar facturas
+                //if (!string.IsNullOrWhiteSpace(cliente.Email))
+                //{
+                //    try
+                //    {
+                //        string clienteCompleto = $"{cliente.Nombre} {cliente.Apellido}".Trim();
+                //        await _emailService.SendClienteDeletedEmailAsync(cliente.Email, clienteCompleto, cliente.Documento);
+                //        _logger.LogInformation($"✅ Email de desactivación enviado a {cliente.Email}");
+                //    }
+                //    catch (Exception emailEx)
+                //    {
+                //        _logger.LogWarning($"⚠️ No se pudo enviar email de desactivación a {cliente.Email}: {emailEx.Message}");
+                //    }
+                //}
 
                 return Ok(new { message = "Cliente desactivado exitosamente" });
             }
