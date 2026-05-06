@@ -26,7 +26,7 @@ const usuarioService = {
   },
 
   restaurar(usuarioEliminadoId) {
-    return httpClient.put(`/usuarios/${usuarioEliminadoId}`, { activo: true })
+    return httpClient.put(`/usuarios/${usuarioEliminadoId}/restaurar`)
   },
 
 }

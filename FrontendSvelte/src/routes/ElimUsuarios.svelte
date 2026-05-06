@@ -111,8 +111,8 @@
       await usuarioService.restaurar(usuario.usuarioEliminadoId)
       successMessage = `Usuario ${usuario.nombreUsuario} restaurado correctamente`
       setTimeout(() => { successMessage = '' }, 3000)
-      usuariosEliminados = usuariosEliminados.filter(u => u.id !== usuario.id)
-      filterUsuarios()
+      // Recargar la lista completa para filtrar usuarios activos
+      await cargarDatos()
     } catch (err) {
       Swal.fire('Error', err.message || 'Error al restaurar usuario', 'error')
       console.error('Error restaurando:', err)

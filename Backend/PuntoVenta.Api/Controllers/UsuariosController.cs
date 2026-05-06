@@ -370,6 +370,58 @@ namespace PuntoVenta.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Restaurar usuario desactivado
+        /// </summary>
+        [Authorize(Roles = "Administrador,Admin")]
+        [HttpPut("{id}/restaurar")]
+        public async Task<IActionResult> RestaurarUsuario(int id)
+        {
+            try
+            {
+                var usuario = await _unitOfWork.Usuarios.GetByIdAsync(id);
+                if (usuario == null)
+                {
+                    return NotFound(new { mensaje = "Usuario no encontrado" });
+                }
+
+                if (usuario.Activo)
+                {
+                    return BadRequest(new { mensaje = "El usuario ya está activo" });
+                }
+
+                usuario.Activo = true;
+                await _unitOfWork.Usuarios.UpdateAsync(usuario);
+
+                // Registrar en auditoría
+                var usuarioIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                string usuarioId = usuarioIdClaim?.Value ?? "0";
+                var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "";
+                var apellido = User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
+                string nombreUsuario = $"{nombre} {apellido}".Trim();
+
+                var auditoria = new AuditoriaAccion
+                {
+                    UsuarioId = usuarioId,
+                    NombreUsuario = nombreUsuario,
+                    TipoAccion = "Editar",
+                    Modulo = "Usuarios",
+                    Descripcion = $"Usuario '{usuario.Nombre}' ha sido restaurado y reactivado en el sistema",
+                    RegistroAfectadoId = id,
+                    RegistroAfectadoDescripcion = usuario.Nombre,
+                    FechaAccion = DateTime.UtcNow
+                };
+                await _unitOfWork.AuditoriasAcciones.AddAsync(auditoria);
+
+                await _unitOfWork.SaveChangesAsync();
+                return Ok(new { mensaje = "Usuario restaurado correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
         // DELETE duplicado removido - usar DeleteUsuario soft delete anterior
     }
 }

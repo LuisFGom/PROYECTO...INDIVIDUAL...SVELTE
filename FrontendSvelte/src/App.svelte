@@ -14,6 +14,7 @@
   import ElimClientes from './routes/ElimClientes.svelte'
   import ElimProductos from './routes/ElimProductos.svelte'
   import ElimVentas from './routes/ElimVentas.svelte'
+  import Auditorias from './routes/Auditorias.svelte'
 
   import Logs from './routes/Logs.svelte'
 
@@ -182,7 +183,15 @@
             </button>
           </li>
 
-
+          <li>
+            <button
+              on:click={() => handleNavigate('auditorias')}
+              class="menu-item {currentPage === 'auditorias' ? 'active' : ''}"
+            >
+              <i class="fas fa-shield-alt"></i>
+              <span>Auditorías</span>
+            </button>
+          </li>
 
           <!-- Separador -->
           <li class="menu-separator"></li>
@@ -234,7 +243,8 @@
             <ElimProductos />
           {:else if currentPage === 'elim-ventas'}
             <ElimVentas />
-
+          {:else if currentPage === 'auditorias'}
+            <Auditorias />
           {:else if currentPage === 'logs'}
             <Logs />
           {/if}

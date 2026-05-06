@@ -193,6 +193,27 @@ namespace PuntoVenta.Api.Controllers
             }
             producto.Activo = true;
             await _unitOfWork.Productos.UpdateAsync(producto);
+            
+            // Registrar en auditoría
+            var usuarioIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            string usuarioId = usuarioIdClaim?.Value ?? "0";
+            var nombre = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "";
+            var apellido = User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value ?? "";
+            string nombreUsuario = $"{nombre} {apellido}".Trim();
+            
+            var auditoria = new AuditoriaAccion
+            {
+                UsuarioId = usuarioId,
+                NombreUsuario = nombreUsuario,
+                TipoAccion = "Editar",
+                Modulo = "Productos",
+                Descripcion = $"Producto '{producto.Nombre}' ha sido restaurado y está nuevamente disponible en el sistema",
+                RegistroAfectadoId = id,
+                RegistroAfectadoDescripcion = producto.Nombre,
+                FechaAccion = DateTime.UtcNow
+            };
+            await _unitOfWork.AuditoriasAcciones.AddAsync(auditoria);
+            
             await _unitOfWork.SaveChangesAsync();
             return Ok(new { mensaje = "Producto restaurado correctamente" });
         }
