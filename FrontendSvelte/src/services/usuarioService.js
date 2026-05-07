@@ -22,7 +22,14 @@ const usuarioService = {
   },
 
   getEliminados() {
-    return httpClient.get('/eliminacionesusuarios')
+    console.log('[DEBUG usuarioService] Llamando a GET /eliminacionesusuarios')
+    return httpClient.get('/eliminacionesusuarios').then(result => {
+      console.log('[DEBUG usuarioService] Respuesta de /eliminacionesusuarios:', result)
+      return result
+    }).catch(err => {
+      console.error('[ERROR usuarioService] Error en GET /eliminacionesusuarios:', err)
+      throw err
+    })
   },
 
   restaurar(usuarioEliminadoId) {

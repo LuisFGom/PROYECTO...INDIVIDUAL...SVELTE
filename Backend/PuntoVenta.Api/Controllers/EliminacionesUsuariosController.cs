@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PuntoVenta.Application.Interfaces;
 using PuntoVenta.Domain.Entities;
+using PuntoVenta.Infrastructure.Persistencia;
 using System.Text;
 
 namespace PuntoVenta.Api.Controllers
@@ -12,25 +14,76 @@ namespace PuntoVenta.Api.Controllers
     public class EliminacionesUsuariosController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ApplicationDbContext _context;
 
-        public EliminacionesUsuariosController(IUnitOfWork unitOfWork)
+        public EliminacionesUsuariosController(IUnitOfWork unitOfWork, ApplicationDbContext context)
         {
             _unitOfWork = unitOfWork;
+            _context = context;
         }
 
         /// <summary>
-        /// Obtener todas las eliminaciones de usuarios
+        /// Obtener todos los usuarios actualmente desactivados con su última eliminación registrada
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             try
             {
+                // Consultar TODOS los usuarios sin filtros automáticos (IgnoreQueryFilters)
+                var todosLosUsuarios = _context.Usuarios.IgnoreQueryFilters().AsNoTracking().ToList();
                 var eliminaciones = await _unitOfWork.EliminacionesUsuarios.GetAllAsync();
-                return Ok(eliminaciones);
+                
+                Console.WriteLine($"[DEBUG EliminacionesUsuariosController] Total usuarios en DB (todos sin filtros): {todosLosUsuarios.Count()}");
+                Console.WriteLine($"[DEBUG EliminacionesUsuariosController] Total eliminaciones en DB: {eliminaciones.Count()}");
+                
+                // Obtener solo usuarios desactivados (Activo = false)
+                var usuariosDesactivados = todosLosUsuarios.Where(u => !u.Activo).ToList();
+                Console.WriteLine($"[DEBUG EliminacionesUsuariosController] Usuarios desactivados (Activo=false): {usuariosDesactivados.Count()}");
+                
+                foreach (var u in usuariosDesactivados)
+                {
+                    Console.WriteLine($"[DEBUG] Usuario desactivado: ID={u.Id}, Nombre={u.Nombre}, Activo={u.Activo}");
+                }
+                
+                // Mapear usuarios desactivados con su última eliminación registrada
+                var resultado = usuariosDesactivados.Select(u => {
+                    var ultimaEliminacion = eliminaciones
+                        .Where(e => e.UsuarioEliminadoId == u.Id)
+                        .OrderByDescending(e => e.FechaEliminacion)
+                        .FirstOrDefault();
+                    
+                    return new
+                    {
+                        id = ultimaEliminacion?.Id ?? 0,
+                        usuarioEliminadoId = u.Id,
+                        nombreUsuario = u.NombreUsuario,
+                        nombre = u.Nombre,
+                        apellido = u.Apellido ?? "",
+                        email = u.Email,
+                        emailUsuarioEliminado = u.Email,
+                        rolNombre = u.RolNombre,
+                        rolUsuarioEliminado = u.RolNombre,
+                        nombreUsuarioEliminado = u.Nombre,
+                        nombreAdministrador = ultimaEliminacion?.NombreAdministrador ?? "Sistema",
+                        tipoEliminacion = ultimaEliminacion?.TipoEliminacion ?? "Desactivación",
+                        fechaEliminacion = ultimaEliminacion?.FechaEliminacion ?? u.FechaCreacion,
+                        motivoEliminacion = ultimaEliminacion?.MotivoEliminacion ?? ""
+                    };
+                }).OrderByDescending(e => e.fechaEliminacion).ToList();
+                
+                Console.WriteLine($"[DEBUG EliminacionesUsuariosController] Resultado a retornar: {resultado.Count()} registros");
+                foreach (var r in resultado)
+                {
+                    Console.WriteLine($"[DEBUG] Resultado: usuarioEliminadoId={r.usuarioEliminadoId}, nombre={r.nombre}");
+                }
+                
+                return Ok(resultado);
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[ERROR EliminacionesUsuariosController] Exception: {ex.Message}");
+                Console.WriteLine($"[ERROR EliminacionesUsuariosController] StackTrace: {ex.StackTrace}");
                 return BadRequest(new { mensaje = ex.Message });
             }
         }

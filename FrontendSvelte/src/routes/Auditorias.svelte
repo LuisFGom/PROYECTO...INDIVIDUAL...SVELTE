@@ -13,6 +13,8 @@
   let searchTerm = ''
   let filterModulo = ''
   let filterTipoAccion = ''
+  let filterFechaDesde = ''
+  let filterFechaHasta = ''
   let currentPage = 1
   let totalPages = 1
   let modalAbierto = false
@@ -80,8 +82,30 @@
       resultado = resultado.filter(a => a.tipoAccion === filterTipoAccion)
     }
 
+    // Filtro por fecha desde
+    if (filterFechaDesde) {
+      const fechaDesde = new Date(filterFechaDesde)
+      resultado = resultado.filter(a => new Date(a.fechaAccion) >= fechaDesde)
+    }
+
+    // Filtro por fecha hasta
+    if (filterFechaHasta) {
+      const fechaHasta = new Date(filterFechaHasta)
+      fechaHasta.setHours(23, 59, 59, 999)
+      resultado = resultado.filter(a => new Date(a.fechaAccion) <= fechaHasta)
+    }
+
     filteredAuditorias = resultado
     currentPage = 1
+  }
+
+  const limpiarFiltros = () => {
+    searchTerm = ''
+    filterModulo = ''
+    filterTipoAccion = ''
+    filterFechaDesde = ''
+    filterFechaHasta = ''
+    filtrarAuditorias()
   }
 
   const goToPage = (page) => {
@@ -124,8 +148,8 @@
   // Obtener módulos únicos para el filtro - REACTIVO
   $: modulosUnicos = [...new Set(auditorias.map(a => a.modulo))].sort()
 
-  // Obtener tipos de acción únicos para el filtro - REACTIVO (sin Reinsertar)
-  $: tiposAccionUnicos = [...new Set(auditorias.map(a => a.tipoAccion).filter(t => t !== 'Reinsertar'))].sort()
+  // Obtener tipos de acción únicos para el filtro - REACTIVO (sin Reinsertar ni Desactivar)
+  $: tiposAccionUnicos = [...new Set(auditorias.map(a => a.tipoAccion).filter(t => t !== 'Reinsertar' && t !== 'Desactivar'))].sort()
 </script>
 
 <div class="auditorias-page">
@@ -136,28 +160,70 @@
 
   <div class="card">
     <div class="card-header">
+      <h3 class="filters-title">Filtros</h3>
       <div class="filters-container">
-        <input
-          class="input search-input"
-          type="text"
-          placeholder="Buscar por usuario, descripción..."
-          bind:value={searchTerm}
-          on:input={() => filtrarAuditorias()}
-        />
+        <div class="filter-group">
+          <label>Usuario</label>
+          <input
+            class="input"
+            type="text"
+            placeholder="ID o nombre del usuario"
+            bind:value={searchTerm}
+          />
+        </div>
 
-        <select class="input filter-select" bind:value={filterModulo} on:change={() => filtrarAuditorias()}>
-          <option value="">Todos los Módulos</option>
-          {#each modulosUnicos as modulo}
-            <option value={modulo}>{modulo}</option>
-          {/each}
-        </select>
+        <div class="filter-group">
+          <label>Módulo</label>
+          <select class="input" bind:value={filterModulo}>
+            <option value="">-- Todos --</option>
+            {#each modulosUnicos as modulo}
+              <option value={modulo}>{modulo}</option>
+            {/each}
+          </select>
+        </div>
 
-        <select class="input filter-select" bind:value={filterTipoAccion} on:change={() => filtrarAuditorias()}>
-          <option value="">Todos los Tipos de Acción</option>
-          {#each tiposAccionUnicos as tipo}
-            <option value={tipo}>{tipo}</option>
-          {/each}
-        </select>
+        <div class="filter-group">
+          <label>Tipo Acción</label>
+          <select class="input" bind:value={filterTipoAccion}>
+            <option value="">-- Todos --</option>
+            {#each tiposAccionUnicos as tipo}
+              <option value={tipo}>{tipo}</option>
+            {/each}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Desde</label>
+          <div class="date-input-wrapper">
+            <input
+              class="input"
+              type="date"
+              bind:value={filterFechaDesde}
+            />
+            <i class="fas fa-calendar"></i>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label>Hasta</label>
+          <div class="date-input-wrapper">
+            <input
+              class="input"
+              type="date"
+              bind:value={filterFechaHasta}
+            />
+            <i class="fas fa-calendar"></i>
+          </div>
+        </div>
+
+        <div class="filter-buttons">
+          <button class="btn btn-primary" on:click={filtrarAuditorias} title="Filtrar">
+            <i class="fas fa-filter"></i> Filtrar
+          </button>
+          <button class="btn btn-secondary" on:click={limpiarFiltros} title="Limpiar filtros">
+            <i class="fas fa-times"></i> Limpiar
+          </button>
+        </div>
       </div>
     </div>
 
@@ -703,5 +769,88 @@
 
   .btn-secondary:hover {
     background: #4B5563;
+  }
+
+  /* Horizontal Filters Styles */
+  .filters-title {
+    margin: 0 0 1rem 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1F2937;
+  }
+
+  .filters-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .filter-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .filter-group .input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+  }
+
+  .filter-group .input:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .date-input-wrapper {
+    position: relative;
+  }
+
+  .date-input-wrapper .input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    padding-right: 35px;
+  }
+
+  .date-input-wrapper i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    pointer-events: none;
+    font-size: 14px;
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    height: 38px;
+  }
+
+  .filter-buttons .btn {
+    white-space: nowrap;
+    padding: 0.65rem 1rem;
+    font-size: 13px;
   }
 </style>

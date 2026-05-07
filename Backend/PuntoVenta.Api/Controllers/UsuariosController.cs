@@ -268,6 +268,29 @@ namespace PuntoVenta.Api.Controllers
                 await _unitOfWork.Usuarios.UpdateAsync(usuario);
                 await _unitOfWork.SaveChangesAsync();
 
+                // Registrar en auditoría
+                var usuarioIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                string usuarioIdAuditoria = usuarioIdClaim?.Value ?? "0";
+                var nombreAuditoria = User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+                var apellidoAuditoria = User.FindFirst(ClaimTypes.Surname)?.Value ?? "";
+                string nombreUsuarioAuditoria = $"{nombreAuditoria} {apellidoAuditoria}".Trim();
+
+                var auditoria = new AuditoriaAccion
+                {
+                    UsuarioId = usuarioIdAuditoria,
+                    NombreUsuario = nombreUsuarioAuditoria,
+                    TipoAccion = "Eliminar",
+                    Modulo = "Usuarios",
+                    Descripcion = $"Usuario '{usuario.Nombre}' ha sido eliminado. {(motivo != null ? $"Motivo: {motivo}" : "")}".Trim(),
+                    RegistroAfectadoId = usuario.Id,
+                    RegistroAfectadoDescripcion = usuario.Nombre,
+                    FechaAccion = DateTime.UtcNow,
+                    DireccionIP = HttpContext.Connection.RemoteIpAddress?.ToString()
+                };
+
+                await _unitOfWork.AuditoriasAcciones.AddAsync(auditoria);
+                await _unitOfWork.SaveChangesAsync();
+
                 return Ok(new { mensaje = "Usuario desactivado exitosamente" });
             }
             catch (Exception ex)

@@ -48,8 +48,15 @@
     loading = true
     try {
       let data = await usuarioService.getEliminados()
+      console.log('[DEBUG ElimUsuarios] Datos recibidos del backend:', data)
+      console.log('[DEBUG ElimUsuarios] Es array:', Array.isArray(data))
+      console.log('[DEBUG ElimUsuarios] Cantidad de registros:', Array.isArray(data) ? data.length : 'N/A')
+      
       data = Array.isArray(data) ? data : []
+      
+      console.log('[DEBUG ElimUsuarios] Antes de normalizar:', data)
       usuariosEliminados = data.map(normalizeEliminado)
+      console.log('[DEBUG ElimUsuarios] Después de normalizar:', usuariosEliminados)
       
       // Deduplicar por usuarioEliminadoId, mantener el primero (más reciente)
       const seenIds = new Set()
@@ -61,13 +68,17 @@
         return true
       })
       
+      console.log('[DEBUG ElimUsuarios] Después de deduplicar:', usuariosEliminados)
+      
       usuariosEliminados.sort((a, b) => new Date(b.fechaEliminacion) - new Date(a.fechaEliminacion))
+      console.log('[DEBUG ElimUsuarios] Usuarios finales a mostrar:', usuariosEliminados.length)
+      
       searchTerm = ''
       currentPage = 1
       filterUsuarios()
     } catch (err) {
+      console.error('[ERROR ElimUsuarios]', err)
       Swal.fire('Error', err.message || 'Error al cargar usuarios eliminados', 'error')
-      console.error('Error cargando eliminados:', err)
     } finally {
       loading = false
     }
@@ -108,14 +119,18 @@
     if (!result.isConfirmed) return
 
     try {
+      console.log('[DEBUG restaurar] Restaurando usuario ID:', usuario.usuarioEliminadoId)
       await usuarioService.restaurar(usuario.usuarioEliminadoId)
+      console.log('[DEBUG restaurar] Usuario restaurado exitosamente')
       successMessage = `Usuario ${usuario.nombreUsuario} restaurado correctamente`
       setTimeout(() => { successMessage = '' }, 3000)
       // Recargar la lista completa para filtrar usuarios activos
+      console.log('[DEBUG restaurar] Recargando datos...')
       await cargarDatos()
+      console.log('[DEBUG restaurar] Datos recargados')
     } catch (err) {
+      console.error('[ERROR restaurar]', err)
       Swal.fire('Error', err.message || 'Error al restaurar usuario', 'error')
-      console.error('Error restaurando:', err)
     }
   }
 </script>
