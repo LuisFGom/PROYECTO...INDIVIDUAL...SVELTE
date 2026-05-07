@@ -33,6 +33,21 @@
 
   let errors = {}
 
+  // Validaciones reactivas en tiempo real (solo cuando el modal está abierto)
+  $: if (showFormModal) {
+    // Filtrar nombre: solo letras, espacios y acentos
+    const nombreFiltrado = formData.nombre.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
+    if (nombreFiltrado !== formData.nombre) {
+      formData.nombre = nombreFiltrado
+    }
+    
+    // Eliminar TODOS los espacios en nombre
+    const nombreSinEspacios = formData.nombre.replace(/\s+/g, '')
+    if (nombreSinEspacios !== formData.nombre) {
+      formData.nombre = nombreSinEspacios
+    }
+  }
+
   // Cálculos reactivos para el resumen
   $: precioCosto = parseFloat(formData.precioCosto) || 0
   $: precioVenta = parseFloat(formData.precio) || 0
@@ -258,7 +273,7 @@
         // UPDATE: espera precioVenta, precioCompra, stock
         dataToSend = {
           id: editingProductoId,
-          nombre: formData.nombre.trim(),
+          nombre: formatters.removeAllSpaces(formData.nombre),
           descripcion: formData.descripcion?.trim() || '',
           precioVenta: parseFloat(formData.precio) || 0,
           precioCompra: parseFloat(formData.precioCosto) || 0,
@@ -271,7 +286,7 @@
       } else {
         // CREATE: espera precio, precioCompra, stockInicial
         dataToSend = {
-          nombre: formData.nombre.trim(),
+          nombre: formatters.removeAllSpaces(formData.nombre),
           codigo: formData.codigo.trim(),
           descripcion: formData.descripcion?.trim() || '',
           precio: parseFloat(formData.precio) || 0,
@@ -572,6 +587,8 @@
               on:input={(e) => {
                 // Limpiar caracteres no permitidos (para paste)
                 let valor = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').substring(0, 40)
+                // Eliminar TODOS los espacios
+                valor = valor.replace(/\s+/g, '')
                 formData.nombre = valor
               }}
             />
