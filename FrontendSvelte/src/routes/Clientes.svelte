@@ -38,11 +38,29 @@
     if (nombreFiltrado !== formData.nombre) {
       formData.nombre = nombreFiltrado
     }
+    
+    // Eliminar TODOS los espacios en nombre
+    const nombreSinEspacios = formData.nombre.replace(/\s+/g, '')
+    if (nombreSinEspacios !== formData.nombre) {
+      formData.nombre = nombreSinEspacios
+    }
 
     // Filtrar apellido: solo letras, espacios y acentos
     const apellidoFiltrado = formData.apellido.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
     if (apellidoFiltrado !== formData.apellido) {
       formData.apellido = apellidoFiltrado
+    }
+    
+    // Eliminar TODOS los espacios en apellido
+    const apellidoSinEspacios = formData.apellido.replace(/\s+/g, '')
+    if (apellidoSinEspacios !== formData.apellido) {
+      formData.apellido = apellidoSinEspacios
+    }
+
+    // Eliminar TODOS los espacios en correo
+    const emailSinEspacios = formData.email.replace(/\s+/g, '')
+    if (emailSinEspacios !== formData.email) {
+      formData.email = emailSinEspacios
     }
 
     // La cédula se formatea en el evento on:input del input
@@ -181,7 +199,7 @@
       if (!formData.cedula?.trim()) {
         errors.cedula = 'La cédula es requerida'
       } else if (!validators.isCedula(formData.cedula)) {
-        errors.cedula = 'La cédula debe tener 10 dígitos (ej: 185104679-8)'
+        errors.cedula = 'La cédula no es válida'
       }
     }
 
@@ -300,9 +318,9 @@
 
     try {
       const dataToSend = {
-        nombre: formData.nombre.trim(),
-        apellido: formData.apellido.trim(),
-        email: formData.email.trim() || null,
+        nombre: formatters.removeAllSpaces(formData.nombre),
+        apellido: formatters.removeAllSpaces(formData.apellido),
+        email: formatters.removeAllSpaces(formData.email.trim()) || null,
         telefono: formData.telefono.replace(/[^0-9]/g, '') || null,
         direccion: formData.direccion.trim() || null
       }
@@ -642,6 +660,9 @@
                 on:input={(e) => {
                   // Limpieza adicional por si acaso (para paste)
                   let valor = e.target.value
+                  // Eliminar TODOS los espacios primero
+                  valor = valor.replace(/\s+/g, '')
+                  
                   const partes = valor.split('@')
                   if (partes.length > 1) {
                     let antes = partes[0].replace(/[^a-zA-Z0-9._\-]/g, '')
