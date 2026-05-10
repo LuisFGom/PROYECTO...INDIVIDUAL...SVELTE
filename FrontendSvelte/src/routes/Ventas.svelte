@@ -255,8 +255,27 @@
     cantidadAAgregar = 1
   }
 
-  const eliminarProducto = (productoId) => {
-    newFactura.productosAgregados = newFactura.productosAgregados.filter(p => p.id !== productoId)
+  const eliminarProducto = async (productoId) => {
+    // Obtener el nombre del producto
+    const producto = newFactura.productosAgregados.find(p => p.id === productoId)
+    if (!producto) return
+
+    // Mostrar confirmación
+    const result = await Swal.fire({
+      title: '¿Desea eliminar el producto?',
+      text: `${producto.nombre} será removido de la factura`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar'
+    })
+
+    // Si el usuario confirma, eliminar
+    if (result.isConfirmed) {
+      newFactura.productosAgregados = newFactura.productosAgregados.filter(p => p.id !== productoId)
+    }
   }
 
   const actualizarCantidad = (productoId, nuevaCantidad) => {
