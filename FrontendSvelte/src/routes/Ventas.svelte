@@ -190,7 +190,8 @@
   const loadProductosParaBusqueda = async () => {
     try {
       const data = await productoService.getAll()
-      productosDisponibles = Array.isArray(data) ? data.filter(p => p.activo !== false) : []
+      // Filtrar solo productos activos Y con stock disponible
+      productosDisponibles = Array.isArray(data) ? data.filter(p => p.activo !== false && (p.stock > 0 || p.cantidad > 0)) : []
       filterProductos()
     } catch (error) {
       console.error('Error cargando productos:', error)
