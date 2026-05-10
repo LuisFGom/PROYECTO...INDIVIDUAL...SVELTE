@@ -41,11 +41,37 @@
     if (nombreFiltrado !== formData.nombre) {
       formData.nombre = nombreFiltrado
     }
+    
+    // Eliminar TODOS los espacios en nombre
+    const nombreSinEspacios = formData.nombre.replace(/\s+/g, '')
+    if (nombreSinEspacios !== formData.nombre) {
+      formData.nombre = nombreSinEspacios
+    }
 
     // Filtrar apellido: solo letras, espacios y acentos
     const apellidoFiltrado = formData.apellido.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
     if (apellidoFiltrado !== formData.apellido) {
       formData.apellido = apellidoFiltrado
+    }
+    
+    // Eliminar TODOS los espacios en apellido
+    const apellidoSinEspacios = formData.apellido.replace(/\s+/g, '')
+    if (apellidoSinEspacios !== formData.apellido) {
+      formData.apellido = apellidoSinEspacios
+    }
+
+    // Eliminar TODOS los espacios en contraseña
+    const contrasenaConEspacios = formData.contrasena
+    const contrasenaSinEspacios = formData.contrasena.replace(/\s+/g, '')
+    if (contrasenaSinEspacios !== contrasenaConEspacios) {
+      formData.contrasena = contrasenaSinEspacios
+    }
+
+    // Eliminar TODOS los espacios en confirmar contraseña
+    const confirmarConEspacios = formData.confirmarContrasena
+    const confirmarSinEspacios = formData.confirmarContrasena.replace(/\s+/g, '')
+    if (confirmarSinEspacios !== confirmarConEspacios) {
+      formData.confirmarContrasena = confirmarSinEspacios
     }
 
     // Convertir nombreUsuario a minúsculas automáticamente
@@ -217,8 +243,8 @@
     try {
       const dataToSend = {
         nombreUsuario: formData.nombreUsuario.trim().toLowerCase(),
-        nombre: formData.nombre.trim(),
-        apellido: formData.apellido.trim(),
+        nombre: formatters.removeAllSpaces(formData.nombre),
+        apellido: formatters.removeAllSpaces(formData.apellido),
         email: formData.email.trim(),
         rolId: parseInt(formData.rol) // Cambiar 'rol' a 'rolId' y convertir a número
       }
@@ -229,7 +255,7 @@
 
       // Incluir contraseña solo en creación
       if (!editingUsuarioId) {
-        dataToSend.contrasena = formData.contrasena
+        dataToSend.contrasena = formatters.removeAllSpaces(formData.contrasena)
         console.log('[SUBMIT] CREACION - Contraseña agregada')
       }
 
