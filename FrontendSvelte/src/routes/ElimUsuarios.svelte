@@ -32,13 +32,13 @@
     return {
       id: eliminado.id,
       usuarioEliminadoId: eliminado.usuarioEliminadoId,
-      nombreUsuario: eliminado.nombreUsuario || eliminado.nombreUsuarioEliminado || 'N/A',
-      nombre: eliminado.nombre || eliminado.nombreUsuarioEliminado || '',
+      nombreUsuario: eliminado.cedulaUsuarioEliminado || eliminado.nombreUsuarioEliminado || 'N/A',
+      nombre: eliminado.nombreUsuarioEliminado || eliminado.nombre || '',
       apellido: eliminado.apellido || '',
       email: eliminado.emailUsuarioEliminado || eliminado.email || '-',
       rolNombre: eliminado.rolUsuarioEliminado || eliminado.rolNombre || 'N/A',
       rol: eliminado.rolUsuarioEliminado || eliminado.rol || 'N/A',
-      eliminadoPor: eliminado.nombreAdministrador || eliminado.eliminadoPor || 'Admin',
+      eliminadoPor: eliminado.nombreAdministrador || eliminado.eliminadoPor || 'Sistema Automático',
       tipoEliminacion: eliminado.tipoEliminacion || 'Desactivación',
       fechaEliminacion: eliminado.fechaEliminacion
     }
@@ -183,7 +183,7 @@
               </tr>
             </thead>
             <tbody>
-              {#each paginatedUsuarios as usuario (usuario.id)}
+              {#each paginatedUsuarios as usuario (usuario.usuarioEliminadoId)}
                 <tr>
                   <td>{usuario.fechaEliminacion ? new Date(usuario.fechaEliminacion).toLocaleString('es-EC') : '-'}</td>
                   <td>

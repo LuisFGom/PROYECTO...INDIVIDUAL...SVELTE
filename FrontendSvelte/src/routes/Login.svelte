@@ -121,10 +121,14 @@
         setCurrentPage('dashboard')
       }
     } catch (error) {
+      const errorMessage = error.message || 'Error desconocido'
+      const isBlocked = errorMessage.includes('Bloqueado') || errorMessage.includes('bloqueado') || errorMessage.includes('Desactivado') || errorMessage.includes('desactivado')
+      
       await Swal.fire({
-        icon: 'error',
-        title: 'Error en el login',
-        text: error.message
+        icon: isBlocked ? 'warning' : 'error',
+        title: isBlocked ? 'Usuario Bloqueado' : 'Error en el login',
+        text: errorMessage,
+        confirmButtonColor: isBlocked ? '#EF4444' : '#3B82F6'
       })
     } finally {
       loading = false

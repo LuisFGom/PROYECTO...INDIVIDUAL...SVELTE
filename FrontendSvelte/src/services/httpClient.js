@@ -59,7 +59,8 @@ class HttpClient {
           const contentType = response.headers.get('content-type')
           if (contentType && contentType.includes('application/json')) {
             const errorData = await response.json()
-            errorMessage = errorData.message || errorData.title || errorData.errors || JSON.stringify(errorData) || errorMessage
+            // Buscar el mensaje en diferentes formatos (message, mensaje, title, errors)
+            errorMessage = errorData.mensaje || errorData.message || errorData.title || errorData.errors || JSON.stringify(errorData) || errorMessage
             errorDetails = errorData
           } else {
             errorMessage = await response.text()
