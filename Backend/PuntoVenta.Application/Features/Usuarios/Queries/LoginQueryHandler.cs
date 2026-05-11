@@ -169,7 +169,20 @@ namespace PuntoVenta.Application.Features.Usuarios.Queries
                     return response;
                 }
 
-                // Login exitoso: Reiniciar intentos fallidos
+                // Login exitoso: Limpiar intentos fallidos previos
+                var emailLowerForClean = request.Email.ToLower();
+                System.Console.WriteLine($"\n✅ [LOGIN EXITOSO] {emailLowerForClean}");
+                var intentosFallidosPrevios = (await _unitOfWork.IntentosLogin.GetAllAsync())
+                    .Where(il => il.NombreUsuario.ToLower() == emailLowerForClean && !il.Exitoso)
+                    .ToList();
+                
+                foreach (var intento in intentosFallidosPrevios)
+                {
+                    await _unitOfWork.IntentosLogin.DeleteAsync(intento.Id);
+                }
+                System.Console.WriteLine($"[DEBUG] Limpiados {intentosFallidosPrevios.Count()} intentos fallidos previos");
+
+                // Registrar el login exitoso
                 await _unitOfWork.IntentosLogin.ReiniciarIntentosAsync(request.Email);
 
                 // Actualizar última fecha de login

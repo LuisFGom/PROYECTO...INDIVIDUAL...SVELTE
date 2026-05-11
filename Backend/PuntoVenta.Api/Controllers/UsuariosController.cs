@@ -416,6 +416,18 @@ namespace PuntoVenta.Api.Controllers
                 usuario.Activo = true;
                 await _unitOfWork.Usuarios.UpdateAsync(usuario);
 
+                // Limpiar intentos fallidos de login para este usuario
+                System.Console.WriteLine($"[DEBUG] Limpiando intentos fallidos para usuario {usuario.Email}");
+                var intentosPrevios = (await _unitOfWork.IntentosLogin.GetAllAsync())
+                    .Where(il => il.NombreUsuario.ToLower() == usuario.Email.ToLower())
+                    .ToList();
+                
+                foreach (var intento in intentosPrevios)
+                {
+                    await _unitOfWork.IntentosLogin.DeleteAsync(intento.Id);
+                }
+                System.Console.WriteLine($"[DEBUG] Se eliminaron {intentosPrevios.Count()} intentos fallidos previos");
+
                 // Registrar en auditoría
                 var usuarioIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
                 string usuarioId = usuarioIdClaim?.Value ?? "0";
